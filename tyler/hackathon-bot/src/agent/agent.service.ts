@@ -291,6 +291,14 @@ export class AgentService {
       ? [CASCADE_TOOL, COMPLETE_JOB_TOOL, CALLBACK_TOOL]
       : ALL_TOOLS;
 
+    // Detect operator dispatch commands — force tool use so Claude can't just say "dispatching" as text
+    const DISPATCH_KEYWORDS = /\b(proceed|dispatch|send|go ahead|approve|approved|yes proceed|have .+ respond|get .+ out there)\b/i;
+    const isOperatorDispatchCommand = channel === 'ops' && DISPATCH_KEYWORDS.test(userMessage);
+    const toolChoice: Anthropic.Messages.ToolChoiceAuto | Anthropic.Messages.ToolChoiceAny =
+      isOperatorDispatchCommand
+        ? { type: 'any' }   // must call at least one tool
+        : { type: 'auto' }; // default
+
     try {
       const firstResponse = await this.client.messages.create({
         model: 'claude-sonnet-4-6',
@@ -298,6 +306,7 @@ export class AgentService {
         system: systemPrompt,
         messages: recentHistory.map(m => ({ role: m.role, content: m.content })),
         tools,
+        tool_choice: toolChoice,
       });
 
       let emergencyAlert: EmergencyAlertData | undefined;

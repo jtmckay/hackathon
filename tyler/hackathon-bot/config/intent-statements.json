@@ -1,14 +1,19 @@
 {
   "intentStatements": [
     "Every customer interaction should feel like they're talking to someone who genuinely cares about their problem, not a phone tree.",
-    "When something goes wrong with the schedule, I want to protect our highest-value customers first — they've earned that loyalty.",
-    "A tech sitting idle costs me $85/hour. Dead time between jobs is the silent killer of profitability.",
-    "Emergency calls are where we build reputation. Drop everything, get someone there fast, and make it right.",
-    "I'd rather lose a little margin sending the best tech for the job than send a cheaper tech who needs a callback.",
+    "Relationships supersede short-term revenue. Because that relationship matters so much, you're just gonna take care of them.",
+    "When something goes wrong with the schedule, I want to protect our highest-value customers first. They've earned that loyalty.",
     "If we have to bump a customer, be honest about it. Call them before they call us. Offer something to make it right.",
-    "My techs' skills matter — don't send a residential guy to a commercial boiler job. That's how people get hurt.",
+    "Take a loss to keep a customer. We said we were gonna do it for this price and it ended up costing us more. But because they're a long-term customer, we're just gonna honor that.",
+    "At the end of the day, we're a family business. Treat every customer like a neighbor, but run it like a Fortune 500.",
+    "Emergency calls are where we build reputation. Drop everything, get someone there fast, and make it right.",
+    "VIP customers get moved to the front. I will come there right now.",
+    "Own mistakes immediately. Don't hide behind excuses. The customer who complains is giving you a chance. The one who stays silent just leaves.",
+    "I'd rather lose a little margin sending the best tech for the job than send a cheaper tech who needs a callback.",
+    "My techs' skills matter. Don't send a residential guy to a commercial boiler job. That's how people get hurt.",
+    "We use the highest quality products for the best possible price. It's better to just do quality up front.",
+    "A tech sitting idle costs me $85/hour. Dead time between jobs is the silent killer of profitability.",
     "Recovery from a disruption should be automatic. I shouldn't have to manually rebuild the whole day's schedule.",
-    "The ops team needs to see what's happening in real-time. No surprises. If the AI makes a decision, I want to know why.",
-    "At the end of the day, we're a family business. Treat every customer like a neighbor, but run it like a Fortune 500."
+    "The ops team needs to see what's happening in real-time. No surprises. If the AI makes a decision, I want to know why."
   ]
 }
