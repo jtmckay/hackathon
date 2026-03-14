@@ -9,12 +9,118 @@
     "lifetimeValue": 14200,
     "jobCount": 12,
     "referralCount": 3,
-    "notes": "VIP. Referred three other customers. Always leaves 5-star reviews. Prefers Marcus for complex work.",
+    "notes": "VIP. Referred three other customers. Always leaves 5-star reviews. Prefers Marcus for complex work. Has a large dog (friendly). Prefers morning appointments.",
     "complaintHistory": [],
     "lastJobDate": "2026-02-10",
     "lastJobType": "Water heater install",
     "communicationPreference": "text",
-    "paymentHistory": "excellent"
+    "paymentHistory": "excellent",
+    "serviceHistory": [
+      {
+        "id": "garcia-ev-1",
+        "timestamp": "2021-03-15T10:00:00Z",
+        "type": "intake",
+        "channel": "customer",
+        "summary": "First call — kitchen faucet replacement. Neighbor referred her to Shamrock.",
+        "details": "Mrs. Garcia called after her neighbor recommended us. Kitchen faucet was corroded and dripping. Scheduled same-week appointment.",
+        "techId": "marcus",
+        "jobType": "Faucet repair",
+        "sentiment": "positive"
+      },
+      {
+        "id": "garcia-ev-2",
+        "timestamp": "2021-03-18T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Kitchen faucet replaced by Marcus. Clean job, customer very happy.",
+        "details": "Replaced corroded kitchen faucet. Noted older copper plumbing throughout — house is well-maintained but pipes are aging. Customer was friendly and appreciative.",
+        "techId": "marcus",
+        "jobType": "Faucet repair",
+        "sentiment": "positive"
+      },
+      {
+        "id": "garcia-ev-3",
+        "timestamp": "2021-03-20T12:00:00Z",
+        "type": "referral",
+        "channel": "system",
+        "summary": "Garcia referred the Chens to Shamrock after her faucet job.",
+        "sentiment": "positive"
+      },
+      {
+        "id": "garcia-ev-4",
+        "timestamp": "2021-09-10T08:30:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Water softener install by Tyler. She baked cookies for the crew.",
+        "details": "Full water softener installation. Tyler handled it cleanly. Mrs. Garcia brought out fresh-baked cookies for the team. Very welcoming household.",
+        "techId": "tyler",
+        "jobType": "Water softener install",
+        "sentiment": "positive"
+      },
+      {
+        "id": "garcia-ev-5",
+        "timestamp": "2022-04-12T06:45:00Z",
+        "type": "intake",
+        "channel": "customer",
+        "summary": "Emergency — basement flooding from burst pipe. Mrs. Garcia was very shaken up.",
+        "details": "Called in distress — water pouring into basement from a burst copper pipe. Immediately dispatched Marcus.",
+        "jobType": "Emergency pipe repair",
+        "sentiment": "distressed"
+      },
+      {
+        "id": "garcia-ev-6",
+        "timestamp": "2022-04-12T07:05:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Marcus responded in 20 minutes to burst pipe. Stayed an extra hour to help with cleanup.",
+        "details": "Burst copper pipe in basement wall. Marcus repaired and re-soldered the section. Water damage was contained to one corner. Marcus stayed an extra hour to help move wet items and set up fans. Mrs. Garcia was really shaken up but calmed down once Marcus arrived. Noted corrosion on adjacent pipes — flagged for future monitoring.",
+        "techId": "marcus",
+        "jobType": "Emergency pipe repair",
+        "resolution": "Pipe repaired, cleanup assisted. Adjacent pipe corrosion noted for monitoring.",
+        "sentiment": "positive"
+      },
+      {
+        "id": "garcia-ev-7",
+        "timestamp": "2023-02-06T08:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Bathroom remodel plumbing — 3-day job by Marcus. Referred the Chens to us after this.",
+        "details": "Full bathroom remodel plumbing. Relocated supply lines, new drain for walk-in shower, dual vanity hookup. 3-day job, Marcus handled all of it. Property has older copper that we're now very familiar with. Mrs. Garcia referred the Chens to us after seeing this quality of work.",
+        "techId": "marcus",
+        "jobType": "Bathroom remodel plumbing",
+        "sentiment": "positive"
+      },
+      {
+        "id": "garcia-ev-8",
+        "timestamp": "2023-02-10T12:00:00Z",
+        "type": "referral",
+        "channel": "system",
+        "summary": "Garcia referred another neighbor after the bathroom remodel.",
+        "sentiment": "positive"
+      },
+      {
+        "id": "garcia-ev-9",
+        "timestamp": "2024-10-15T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Tankless water heater install by Marcus. Requested Marcus specifically.",
+        "details": "Replaced old tank water heater with tankless unit. Mrs. Garcia specifically requested Marcus — they have a great rapport. Install went smoothly. Noted the copper supply lines are holding up well since the burst pipe repair in 2022.",
+        "techId": "marcus",
+        "jobType": "Water heater install",
+        "sentiment": "positive"
+      },
+      {
+        "id": "garcia-ev-10",
+        "timestamp": "2026-02-10T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Annual maintenance check and minor valve replacement by Marcus.",
+        "details": "Routine maintenance visit. Replaced a slow-leaking shutoff valve under the kitchen sink. Checked all accessible plumbing — everything in good shape. Mrs. Garcia mentioned her dog Biscuit is getting old but still friendly.",
+        "techId": "marcus",
+        "jobType": "Water heater install",
+        "sentiment": "positive"
+      }
+    ]
   },
   {
     "id": "chen",
@@ -31,7 +137,63 @@
     "lastJobDate": "2025-11-18",
     "lastJobType": "Faucet repair",
     "communicationPreference": "call",
-    "paymentHistory": "excellent"
+    "paymentHistory": "excellent",
+    "serviceHistory": [
+      {
+        "id": "chen-ev-1",
+        "timestamp": "2020-06-22T10:00:00Z",
+        "type": "intake",
+        "channel": "customer",
+        "summary": "First call — garbage disposal replacement. Garcia referred him.",
+        "details": "Mr. Chen called after Mrs. Garcia recommended Shamrock. Garbage disposal had died. Quiet guy but polite.",
+        "jobType": "Garbage disposal replacement",
+        "sentiment": "neutral"
+      },
+      {
+        "id": "chen-ev-2",
+        "timestamp": "2020-06-25T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Garbage disposal replaced by Tyler. Customer quiet but clearly satisfied.",
+        "details": "Straightforward disposal swap. Older home, pipes in decent shape. Mr. Chen doesn't say much but shook Tyler's hand and said thanks.",
+        "techId": "tyler",
+        "jobType": "Garbage disposal replacement",
+        "sentiment": "positive"
+      },
+      {
+        "id": "chen-ev-3",
+        "timestamp": "2022-03-14T08:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Water heater flush and maintenance by Marcus. No issues found.",
+        "details": "Annual water heater maintenance. Flushed sediment, checked anode rod. Everything in good condition. Mr. Chen had tea ready for Marcus — quiet hospitality.",
+        "techId": "marcus",
+        "jobType": "Water heater maintenance",
+        "sentiment": "positive"
+      },
+      {
+        "id": "chen-ev-4",
+        "timestamp": "2024-01-08T10:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Whole-house re-pipe consultation and partial re-pipe by Marcus. Major job over 4 days.",
+        "details": "Mr. Chen wanted to proactively address aging galvanized pipes. Marcus did a full assessment and re-piped the main runs over 4 days. Cleanest job site Marcus has seen — Mr. Chen kept everything spotless. Referred a coworker after this.",
+        "techId": "marcus",
+        "jobType": "Re-pipe (partial)",
+        "sentiment": "positive"
+      },
+      {
+        "id": "chen-ev-5",
+        "timestamp": "2025-11-18T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Kitchen faucet repair by Tyler. Quick fix, customer satisfied.",
+        "details": "Kitchen faucet cartridge replacement. 30-minute job. Mr. Chen had already identified the model number for us — very organized homeowner.",
+        "techId": "tyler",
+        "jobType": "Faucet repair",
+        "sentiment": "positive"
+      }
+    ]
   },
   {
     "id": "patterson",
@@ -43,12 +205,68 @@
     "lifetimeValue": 7600,
     "jobCount": 6,
     "referralCount": 2,
-    "notes": "Always pays on time. Flexible with scheduling. Good communicator.",
+    "notes": "Always pays on time. Flexible with scheduling. Good communicator. Has referred two neighbors.",
     "complaintHistory": [],
     "lastJobDate": "2026-01-05",
     "lastJobType": "Drain clearing",
     "communicationPreference": "text",
-    "paymentHistory": "excellent"
+    "paymentHistory": "excellent",
+    "serviceHistory": [
+      {
+        "id": "patterson-ev-1",
+        "timestamp": "2022-01-10T14:00:00Z",
+        "type": "intake",
+        "channel": "customer",
+        "summary": "First call — slow drain in master bathroom. Found us through Google reviews.",
+        "details": "Mr. Patterson found Shamrock online. Master bath drain running slow. Scheduled within two days.",
+        "jobType": "Drain clearing",
+        "sentiment": "neutral"
+      },
+      {
+        "id": "patterson-ev-2",
+        "timestamp": "2022-01-12T10:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Drain cleared by Jake. Found heavy buildup — recommended enzyme treatment monthly.",
+        "details": "Heavy mineral/hair buildup in master bath drain. Jake cleared it and recommended monthly enzyme treatment. Mr. Patterson was very communicative and appreciated the advice.",
+        "techId": "jake",
+        "jobType": "Drain clearing",
+        "sentiment": "positive"
+      },
+      {
+        "id": "patterson-ev-3",
+        "timestamp": "2023-05-20T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Toilet replacement in guest bathroom by Tyler. Customer flexible on timing — took a cancellation slot.",
+        "details": "Guest bathroom toilet was constantly running. Replaced with a new low-flow model. Mr. Patterson was happy to take a cancellation slot on short notice — very easy to schedule.",
+        "techId": "tyler",
+        "jobType": "Toilet repair/replace",
+        "sentiment": "positive"
+      },
+      {
+        "id": "patterson-ev-4",
+        "timestamp": "2024-07-15T08:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Outdoor hose bib repair and sump pump inspection by Marcus.",
+        "details": "Hose bib was leaking at the wall connection. Marcus repaired and also inspected the sump pump at Patterson's request — pump is in good shape. Referred a neighbor to us after this visit.",
+        "techId": "marcus",
+        "jobType": "Hose bib repair",
+        "sentiment": "positive"
+      },
+      {
+        "id": "patterson-ev-5",
+        "timestamp": "2026-01-05T10:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Drain clearing in kitchen by Jake. Grease buildup — advised on prevention.",
+        "details": "Kitchen drain clogged with grease. Jake cleared it and spent time explaining prevention. Mr. Patterson appreciated the education — said he'd spread the word. Second referral expected.",
+        "techId": "jake",
+        "jobType": "Drain clearing",
+        "sentiment": "positive"
+      }
+    ]
   },
   {
     "id": "ramirez",
@@ -65,7 +283,31 @@
     "lastJobDate": "2025-10-20",
     "lastJobType": "Drain clearing",
     "communicationPreference": "text",
-    "paymentHistory": "good"
+    "paymentHistory": "good",
+    "serviceHistory": [
+      {
+        "id": "ramirez-ev-1",
+        "timestamp": "2024-08-12T11:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Water softener install by Tyler. First job for this customer.",
+        "details": "New water softener installation. Mr. Ramirez just moved to the area. Easy to work with, paid promptly.",
+        "techId": "tyler",
+        "jobType": "Water softener install",
+        "sentiment": "positive"
+      },
+      {
+        "id": "ramirez-ev-2",
+        "timestamp": "2025-10-20T14:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Drain clearing by Jake. Quick job, no complications.",
+        "details": "Bathroom drain cleared. Standard buildup. Mr. Ramirez is building a nice relationship with Shamrock.",
+        "techId": "jake",
+        "jobType": "Drain clearing",
+        "sentiment": "positive"
+      }
+    ]
   },
   {
     "id": "thorpe",
@@ -82,7 +324,42 @@
     "lastJobDate": "2026-01-22",
     "lastJobType": "Toilet repair/replace",
     "communicationPreference": "call",
-    "paymentHistory": "good"
+    "paymentHistory": "good",
+    "serviceHistory": [
+      {
+        "id": "thorpe-ev-1",
+        "timestamp": "2023-06-01T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Faucet replacement in kitchen by Jake. First job — customer was referred by a friend.",
+        "details": "Kitchen faucet swap. Mr. Thorpe was easygoing. Mentioned a friend recommended Shamrock but didn't give a name.",
+        "techId": "jake",
+        "jobType": "Faucet repair",
+        "sentiment": "positive"
+      },
+      {
+        "id": "thorpe-ev-2",
+        "timestamp": "2024-11-05T13:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Water heater maintenance by Tyler. Tank in good shape, flushed sediment.",
+        "details": "Annual water heater flush. Tank is only 3 years old, in great condition. Mr. Thorpe asked about tankless options for the future — noted for follow-up.",
+        "techId": "tyler",
+        "jobType": "Water heater maintenance",
+        "sentiment": "positive"
+      },
+      {
+        "id": "thorpe-ev-3",
+        "timestamp": "2026-01-22T10:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Toilet replacement in hall bathroom by Tyler. Took a cancellation slot happily.",
+        "details": "Hall bathroom toilet was old and inefficient. Replaced with a new model. Mr. Thorpe was happy to take a last-minute cancellation slot — very flexible customer.",
+        "techId": "tyler",
+        "jobType": "Toilet repair/replace",
+        "sentiment": "positive"
+      }
+    ]
   },
   {
     "id": "park",
@@ -99,7 +376,31 @@
     "lastJobDate": "2026-02-14",
     "lastJobType": "Faucet repair",
     "communicationPreference": "text",
-    "paymentHistory": "good"
+    "paymentHistory": "good",
+    "serviceHistory": [
+      {
+        "id": "park-ev-1",
+        "timestamp": "2025-09-05T10:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Drain clearing by Jake. First-time customer, found us online.",
+        "details": "Bathroom drain was slow. Jake cleared it quickly. Ms. Park was polite and responsive via text.",
+        "techId": "jake",
+        "jobType": "Drain clearing",
+        "sentiment": "positive"
+      },
+      {
+        "id": "park-ev-2",
+        "timestamp": "2026-02-14T11:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Kitchen faucet cartridge replacement by Tyler.",
+        "details": "Dripping kitchen faucet — cartridge was worn. Tyler replaced it in 20 minutes. Ms. Park appreciated the quick turnaround.",
+        "techId": "tyler",
+        "jobType": "Faucet repair",
+        "sentiment": "positive"
+      }
+    ]
   },
   {
     "id": "johnson",
@@ -116,7 +417,20 @@
     "lastJobDate": "2025-12-15",
     "lastJobType": "Drain clearing",
     "communicationPreference": "text",
-    "paymentHistory": "good"
+    "paymentHistory": "good",
+    "serviceHistory": [
+      {
+        "id": "johnson-ev-1",
+        "timestamp": "2025-12-15T14:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Drain clearing by Danny. First and only job so far.",
+        "details": "Bathroom drain clog. Danny handled it well — routine job. Mr. Johnson seemed satisfied but didn't say much.",
+        "techId": "danny",
+        "jobType": "Drain clearing",
+        "sentiment": "neutral"
+      }
+    ]
   },
   {
     "id": "webber",
@@ -133,7 +447,8 @@
     "lastJobDate": null,
     "lastJobType": null,
     "communicationPreference": "call",
-    "paymentHistory": "excellent"
+    "paymentHistory": "excellent",
+    "serviceHistory": []
   },
   {
     "id": "morris",
@@ -163,7 +478,55 @@
     "lastJobDate": "2025-03-20",
     "lastJobType": "Faucet repair",
     "communicationPreference": "call",
-    "paymentHistory": "slow"
+    "paymentHistory": "slow",
+    "serviceHistory": [
+      {
+        "id": "morris-ev-1",
+        "timestamp": "2024-04-10T10:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Drain clearing by Tyler. First job for this customer.",
+        "details": "Standard drain clearing in master bath. Job went fine.",
+        "techId": "tyler",
+        "jobType": "Drain clearing",
+        "sentiment": "neutral"
+      },
+      {
+        "id": "morris-ev-2",
+        "timestamp": "2024-09-15T11:00:00Z",
+        "type": "complaint",
+        "channel": "customer",
+        "summary": "Claimed drain was still slow after clearing. Free callback — no issue found.",
+        "details": "Mr. Morris called saying the drain Tyler cleared was still slow. Sent Tyler back for a free callback. Tyler found the drain flowing normally — no issue detected.",
+        "techId": "tyler",
+        "jobType": "Drain clearing",
+        "resolution": "Free callback — no issue found",
+        "sentiment": "negative"
+      },
+      {
+        "id": "morris-ev-3",
+        "timestamp": "2025-01-08T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Faucet repair by Jake. Replaced bathroom faucet cartridge.",
+        "details": "Bathroom faucet was dripping. Jake replaced the cartridge. Straightforward job.",
+        "techId": "jake",
+        "jobType": "Faucet repair",
+        "sentiment": "neutral"
+      },
+      {
+        "id": "morris-ev-4",
+        "timestamp": "2025-03-20T10:00:00Z",
+        "type": "complaint",
+        "channel": "customer",
+        "summary": "Reported faucet leaking again 2 weeks after repair. Free callback — no issue found.",
+        "details": "Mr. Morris reported the faucet Jake repaired was leaking again. Sent Jake back for a free callback. Faucet was in perfect working order — no leak detected. Pattern emerging.",
+        "techId": "jake",
+        "jobType": "Faucet repair",
+        "resolution": "Free callback — no issue found",
+        "sentiment": "negative"
+      }
+    ]
   },
   {
     "id": "foster",
@@ -180,6 +543,59 @@
     "lastJobDate": "2026-02-28",
     "lastJobType": "Water heater install",
     "communicationPreference": "text",
-    "paymentHistory": "excellent"
+    "paymentHistory": "excellent",
+    "serviceHistory": [
+      {
+        "id": "foster-ev-1",
+        "timestamp": "2021-11-08T10:00:00Z",
+        "type": "intake",
+        "channel": "customer",
+        "summary": "First call — leaking pipe under kitchen sink. Neighbor recommended Shamrock.",
+        "details": "Mrs. Foster called about a slow leak under the kitchen sink. A neighbor recommended us. Scheduled next-day appointment.",
+        "jobType": "Pipe repair",
+        "sentiment": "neutral"
+      },
+      {
+        "id": "foster-ev-2",
+        "timestamp": "2021-11-09T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Kitchen pipe repair by Marcus. Found corroded fitting, replaced section.",
+        "details": "Corroded copper fitting under kitchen sink. Marcus replaced a 2-foot section and the shutoff valve. Noted that the home has mostly copper plumbing in good condition.",
+        "techId": "marcus",
+        "jobType": "Pipe repair",
+        "sentiment": "positive"
+      },
+      {
+        "id": "foster-ev-3",
+        "timestamp": "2023-08-20T08:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Full bathroom rough-in for basement renovation by Marcus. 2-day job.",
+        "details": "Mrs. Foster finishing her basement. Marcus ran all new plumbing for a full bathroom — toilet, shower, vanity. Clean work through concrete slab. She referred a coworker after this.",
+        "techId": "marcus",
+        "jobType": "Bathroom rough-in",
+        "sentiment": "positive"
+      },
+      {
+        "id": "foster-ev-4",
+        "timestamp": "2023-08-25T12:00:00Z",
+        "type": "referral",
+        "channel": "system",
+        "summary": "Foster referred a coworker to Shamrock after basement bathroom job.",
+        "sentiment": "positive"
+      },
+      {
+        "id": "foster-ev-5",
+        "timestamp": "2026-02-28T09:00:00Z",
+        "type": "completion",
+        "channel": "tech",
+        "summary": "Water heater install by Tyler. Replaced 12-year-old tank unit.",
+        "details": "Replaced aging 50-gallon tank water heater with a new high-efficiency model. Tyler handled the install — straightforward swap. Within warranty window for any follow-up issues.",
+        "techId": "tyler",
+        "jobType": "Water heater install",
+        "sentiment": "positive"
+      }
+    ]
   }
 ]

@@ -1,0 +1,16 @@
+{
+  "name": "shamrock-test-client",
+  "version": "1.0.0",
+  "description": "Telegram userbot for testing Shamrock Plumbing dispatch bot as a customer",
+  "type": "module",
+  "scripts": {
+    "setup": "tsx setup.ts",
+    "send": "tsx send.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "telegram": "^2.26.22",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}

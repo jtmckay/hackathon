@@ -47,6 +47,7 @@ export interface Customer {
   lastJobType: string | null;
   communicationPreference: CommunicationPreference;
   paymentHistory: PaymentHistory;
+  serviceHistory: ServiceEvent[];
 }
 
 export type JobStatus = "scheduled" | "in_progress" | "completed" | "rescheduled" | "paused" | "cancelled";
@@ -109,4 +110,72 @@ export interface Policies {
   cancellation: { notice: string; fee: number; lateCancel: string };
   payment: { terms: string; methods: string[]; netTermsForCommercial: number };
   emergencyResponse: { guarantee: string; dispatchTarget: string };
+}
+
+// --- Reminder types ---
+
+export interface ReminderCreator {
+  role: "customer" | "ops" | "tech" | "ceo" | "system";
+  id: string; // customer ID, tech ID, or "blake" / "ceo"
+}
+
+export type ReminderTargetChannel = "customer" | "ops" | "tech" | "ceo";
+
+export interface ReminderRecurrence {
+  interval: "daily" | "weekly" | "monthly" | "yearly" | "custom";
+  customDays?: number;
+  endAfter?: string; // ISO date to stop recurring, or null for indefinite
+}
+
+export type ReminderStatus = "active" | "triggered" | "snoozed" | "cancelled";
+
+export interface Reminder {
+  id: string;
+  createdAt: string;
+  createdBy: ReminderCreator;
+  targetChannel: ReminderTargetChannel;
+  targetId?: string; // customer ID or tech ID if channel-specific
+  triggerAt: string; // ISO datetime for next notification
+  recurrence?: ReminderRecurrence;
+  message: string; // what to tell the user
+  context: string; // why this reminder exists (for agent reasoning)
+  status: ReminderStatus;
+  snoozedUntil?: string;
+  jobId?: string;
+  customerId?: string;
+}
+
+// --- Service event types ---
+
+export type ServiceEventType =
+  | "intake"
+  | "dispatch"
+  | "tech_assigned"
+  | "schedule_change"
+  | "tech_update"
+  | "completion"
+  | "feedback"
+  | "complaint"
+  | "resolution"
+  | "follow_up"
+  | "note"
+  | "warranty_claim"
+  | "referral"
+  | "communication";
+
+export type ServiceEventChannel = "customer" | "ops" | "tech" | "system";
+export type Sentiment = "positive" | "neutral" | "negative" | "distressed";
+
+export interface ServiceEvent {
+  id: string;
+  timestamp: string;
+  type: ServiceEventType;
+  channel: ServiceEventChannel;
+  summary: string;
+  details?: string;
+  techId?: string;
+  jobType?: string;
+  resolution?: string;
+  sentiment?: Sentiment;
+  agentReasoning?: string;
 }

@@ -14,8 +14,8 @@ default_routine: develop
 hooks:
   beforeAll: ""
   afterAll: ""
-  beforeEach: "git-baseline"
-  afterEach: "git-stash-changes"
+  beforeEach: ""
+  afterEach: ""
   # --- Git stash workflow (uncomment to enable) ---
   # beforeEach: "git-baseline"
   # afterEach: "git-stash-changes"

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "reminder-garcia-flush",
+    "createdAt": "2025-10-15T14:00:00Z",
+    "createdBy": { "role": "system", "id": "system" },
+    "targetChannel": "customer",
+    "targetId": "garcia",
+    "triggerAt": "2026-03-16T09:00:00Z",
+    "recurrence": { "interval": "yearly" },
+    "message": "Hi Mrs. Garcia — this is Shamrock Plumbing. Back in October, Marcus installed your tankless water heater. The manufacturer recommends an annual flush to keep it running efficiently. Want me to get that scheduled? Marcus is available next week if you'd like the same tech who did the install.",
+    "context": "Water heater installed by Marcus in October 2024. Manufacturer recommends annual tank flush. Garcia is Tier 1 VIP — personalize with tech name and history.",
+    "status": "active",
+    "customerId": "garcia"
+  },
+  {
+    "id": "reminder-chen-warranty",
+    "createdAt": "2026-02-16T10:00:00Z",
+    "createdBy": { "role": "system", "id": "system" },
+    "targetChannel": "ops",
+    "targetId": "blake",
+    "triggerAt": "2026-03-18T08:00:00Z",
+    "message": "Chen warranty from February water softener install expires in 3 days. No issues reported.",
+    "context": "30-day workmanship warranty tracking for Chen's water softener installation on Feb 16. Standard warranty expiry notice for Blake's morning briefing.",
+    "status": "active",
+    "customerId": "chen"
+  },
+  {
+    "id": "reminder-blake-danny-callbacks",
+    "createdAt": "2026-03-14T09:00:00Z",
+    "createdBy": { "role": "ops", "id": "blake" },
+    "targetChannel": "ops",
+    "targetId": "blake",
+    "triggerAt": "2026-04-01T08:00:00Z",
+    "message": "Review Danny's callback rate — last check showed 8%, target is under 5%. Include comparison data and mentorship pairing effectiveness.",
+    "context": "Blake requested a reminder to review Danny's callback rate. Danny is a junior tech (6 months) being mentored by Marcus. Callback rate was 8% as of mid-March.",
+    "status": "active"
+  }
+]

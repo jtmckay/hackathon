@@ -1,0 +1,70 @@
+[
+  {
+    "id": "marcus",
+    "name": "Marcus",
+    "seniority": "senior",
+    "years": 8,
+    "specialties": ["water heaters", "gas lines", "emergency repair", "remodels"],
+    "certifications": ["gas certified", "backflow certified"],
+    "currentLocation": "Lehi / American Fork",
+    "status": "on_job",
+    "currentJobId": 1,
+    "notes": "Blake's most trusted tech. Great with nervous customers. Send him to the hard jobs and the important clients.",
+    "metrics": {
+      "avgCallbackRate": 0.02,
+      "avgRating": 4.9,
+      "emergencyResponseCount": 47
+    }
+  },
+  {
+    "id": "tyler",
+    "name": "Tyler",
+    "seniority": "mid",
+    "years": 3,
+    "specialties": ["drains", "faucets", "toilets", "water heaters"],
+    "certifications": ["backflow certified"],
+    "currentLocation": "Orem / Provo",
+    "status": "on_job",
+    "currentJobId": 4,
+    "notes": "Reliable and fast. Good with routine jobs. Not ready for gas work or complex emergencies solo.",
+    "metrics": {
+      "avgCallbackRate": 0.05,
+      "avgRating": 4.7,
+      "emergencyResponseCount": 12
+    }
+  },
+  {
+    "id": "jake",
+    "name": "Jake",
+    "seniority": "mid",
+    "years": 2,
+    "specialties": ["drains", "faucets", "general maintenance", "water softeners"],
+    "certifications": [],
+    "currentLocation": "Pleasant Grove / Lindon",
+    "status": "on_job",
+    "currentJobId": 6,
+    "notes": "Fastest drain clearer on the team. Still building customer skills. Don't send to first-time customers alone if avoidable.",
+    "metrics": {
+      "avgCallbackRate": 0.06,
+      "avgRating": 4.5,
+      "emergencyResponseCount": 5
+    }
+  },
+  {
+    "id": "danny",
+    "name": "Danny",
+    "seniority": "junior",
+    "years": 0.5,
+    "specialties": ["general maintenance", "faucets", "toilets"],
+    "certifications": [],
+    "currentLocation": "Spanish Fork / Springville",
+    "status": "on_job",
+    "currentJobId": 8,
+    "notes": "Apprentice. Learning fast but needs supervision on anything complex. Great attitude. Customers like him but he's not ready for emergencies.",
+    "metrics": {
+      "avgCallbackRate": 0.08,
+      "avgRating": 4.6,
+      "emergencyResponseCount": 0
+    }
+  }
+]

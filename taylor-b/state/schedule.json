@@ -1,0 +1,121 @@
+{
+  "date": "2026-03-16",
+  "jobs": [
+    {
+      "id": 1,
+      "techId": "marcus",
+      "time": "08:00",
+      "durationHrs": 3,
+      "type": "Water heater install",
+      "customerId": "garcia",
+      "address": "1847 Canyon Rd, Lehi",
+      "status": "scheduled",
+      "notes": "VIP customer, full install. Marcus specifically requested.",
+      "bumpable": false
+    },
+    {
+      "id": 2,
+      "techId": "marcus",
+      "time": "12:00",
+      "durationHrs": 1.5,
+      "type": "Gas leak diagnosis",
+      "customerId": "patterson",
+      "address": "291 Oak Hill Ln, Orem",
+      "status": "scheduled",
+      "notes": "Possible gas smell near water heater. Needs gas-certified tech.",
+      "bumpable": false
+    },
+    {
+      "id": 3,
+      "techId": "marcus",
+      "time": "14:00",
+      "durationHrs": 2,
+      "type": "Faucet repair",
+      "customerId": "martinez",
+      "address": "3201 Summit View Dr, Lehi",
+      "status": "scheduled",
+      "notes": "Kitchen faucet replacement. Loyal customer.",
+      "bumpable": true
+    },
+    {
+      "id": 4,
+      "techId": "tyler",
+      "time": "08:00",
+      "durationHrs": 2,
+      "type": "Drain clearing",
+      "customerId": "ramirez",
+      "address": "408 Birch St, Provo",
+      "status": "scheduled",
+      "notes": "Slow kitchen drain. Routine job.",
+      "bumpable": true
+    },
+    {
+      "id": 5,
+      "techId": "tyler",
+      "time": "13:00",
+      "durationHrs": 2,
+      "type": "Toilet repair/replace",
+      "customerId": "thorpe",
+      "address": "733 Willow Way, Pleasant Grove",
+      "status": "scheduled",
+      "notes": "Running toilet, likely flapper valve. Customer is flexible.",
+      "bumpable": true
+    },
+    {
+      "id": 6,
+      "techId": "jake",
+      "time": "08:30",
+      "durationHrs": 1.5,
+      "type": "Drain clearing",
+      "customerId": "park",
+      "address": "159 Cedar Ct, Lindon",
+      "status": "scheduled",
+      "notes": "Bathroom drain. Routine for Jake.",
+      "bumpable": true
+    },
+    {
+      "id": 7,
+      "techId": "jake",
+      "time": "13:00",
+      "durationHrs": 1.5,
+      "type": "Water softener service",
+      "customerId": "chen",
+      "address": "562 Maple Dr, American Fork",
+      "status": "scheduled",
+      "notes": "Annual water softener maintenance. VIP customer.",
+      "bumpable": true
+    },
+    {
+      "id": 8,
+      "techId": "danny",
+      "time": "09:00",
+      "durationHrs": 2,
+      "type": "Faucet repair",
+      "customerId": "johnson",
+      "address": "2105 Sage Brush Dr, Saratoga Springs",
+      "status": "scheduled",
+      "notes": "New customer, bathroom faucet drip. Simple job for Danny.",
+      "bumpable": true
+    }
+  ],
+  "flexSlots": [
+    {
+      "id": "flex-am",
+      "tech": null,
+      "time": "11:00",
+      "duration_hrs": 1,
+      "type": "FLEX_BUFFER",
+      "status": "available",
+      "notes": "Morning emergency buffer — held open by design"
+    },
+    {
+      "id": "flex-pm",
+      "tech": null,
+      "time": "14:30",
+      "duration_hrs": 1,
+      "type": "FLEX_BUFFER",
+      "status": "available",
+      "notes": "Afternoon emergency buffer — held open by design"
+    }
+  ]
+}
