@@ -79,6 +79,7 @@ export class SeedService implements OnModuleInit {
           lifetimeValue: cust.lifetimeValue,
           jobHistory: cust.jobHistory,
           paymentStatus: cust.paymentStatus,
+          customerSince: cust.customerSince || '',
           notes: cust.notes || null,
         },
         create: {
@@ -92,6 +93,7 @@ export class SeedService implements OnModuleInit {
           lifetimeValue: cust.lifetimeValue,
           jobHistory: cust.jobHistory,
           paymentStatus: cust.paymentStatus,
+          customerSince: cust.customerSince || '',
           notes: cust.notes || null,
         },
       });

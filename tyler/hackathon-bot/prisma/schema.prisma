@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -55,6 +54,7 @@ model Customer {
   lifetimeValue Float    @default(0)
   jobHistory    Int      @default(0)
   paymentStatus String   @default("current") // current, overdue, collections
+  customerSince String   @default("") // e.g. "January 2022"
   notes         String?
   scheduledJobs ScheduledJob[]
 }

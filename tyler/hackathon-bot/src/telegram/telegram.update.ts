@@ -52,12 +52,19 @@ export class TelegramUpdate {
     this.logger.log(`[${channelType}] ${senderName}: ${message.text}`);
 
     try {
-      const response = await this.agent.chat(
+      const result = await this.agent.chat(
         chatId,
         agentChannel,
         `[${senderName}]: ${message.text}`,
       );
-      await ctx.reply(response);
+
+      // Post ops alert if an emergency was classified
+      if (result.emergencyAlert) {
+        this.logger.log(`Emergency classified: ${result.emergencyAlert.severity} — posting ops alert`);
+        await this.telegram.postEmergencyAlert(result.emergencyAlert);
+      }
+
+      await ctx.reply(result.response);
     } catch (error) {
       this.logger.error(`Error processing message: ${error.message}`);
       await ctx.reply('Sorry, I ran into an issue processing that. Please try again.');

@@ -11,6 +11,7 @@
       "lifetimeValue": 12500,
       "jobHistory": 18,
       "paymentStatus": "current",
+      "customerSince": "March 2018",
       "notes": "Long-time customer. Referred 3 neighbors. Prefers morning appointments."
     },
     {
@@ -24,6 +25,7 @@
       "lifetimeValue": 6200,
       "jobHistory": 9,
       "paymentStatus": "current",
+      "customerSince": "July 2020",
       "notes": "Commercial property manager. Books quarterly maintenance."
     },
     {
@@ -36,6 +38,7 @@
       "lifetimeValue": 850,
       "jobHistory": 2,
       "paymentStatus": "current",
+      "customerSince": "January 2024",
       "notes": "New customer, just moved to the area."
     },
     {
@@ -49,6 +52,7 @@
       "lifetimeValue": 8900,
       "jobHistory": 14,
       "paymentStatus": "current",
+      "customerSince": "November 2019",
       "notes": "Owns two rental properties. Always wants detailed invoices."
     },
     {
@@ -62,6 +66,7 @@
       "lifetimeValue": 15200,
       "jobHistory": 22,
       "paymentStatus": "current",
+      "customerSince": "April 2017",
       "notes": "Restaurant owner. Commercial account. Emergency priority."
     },
     {
@@ -74,6 +79,7 @@
       "lifetimeValue": 1200,
       "jobHistory": 3,
       "paymentStatus": "overdue",
+      "customerSince": "August 2023",
       "notes": "Has an outstanding invoice from last month. Otherwise fine."
     },
     {
@@ -87,6 +93,7 @@
       "lifetimeValue": 450,
       "jobHistory": 1,
       "paymentStatus": "current",
+      "customerSince": "February 2025",
       "notes": "First-time customer. Called about a leak."
     },
     {
@@ -100,6 +107,7 @@
       "lifetimeValue": 5400,
       "jobHistory": 8,
       "paymentStatus": "current",
+      "customerSince": "June 2021",
       "notes": "Prefers afternoon appointments. Has a dog, please call before arriving."
     }
   ]

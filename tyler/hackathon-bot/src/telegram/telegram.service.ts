@@ -68,6 +68,33 @@ export class TelegramService {
     }
   }
 
+  async postEmergencyAlert(data: {
+    severity: 'Critical' | 'Urgent';
+    customerName: string;
+    customerTier: string;
+    customerSince: string;
+    address: string;
+    isNewCustomer: boolean;
+    issue: string;
+    safetyConcerns: string;
+  }): Promise<void> {
+    const customerLabel = data.isNewCustomer
+      ? `${data.customerName} (NEW)`
+      : `${data.customerName} (${data.customerTier} — customer since ${data.customerSince})`;
+
+    const message =
+      `🚨 *EMERGENCY INCOMING*\n` +
+      `Severity: *${data.severity}*\n` +
+      `Customer: ${customerLabel}\n` +
+      `Address: ${data.address || 'Collecting...'}\n` +
+      `Issue: ${data.issue}\n` +
+      `Safety concerns: ${data.safetyConcerns || 'none'}\n` +
+      `Status: Qualifying — awaiting dispatch decision`;
+
+    await this.sendToOps(message);
+    this.logger.log(`Emergency alert posted: ${data.severity} — ${data.issue}`);
+  }
+
   async postSchedule(): Promise<string> {
     const jobs = await this.prisma.scheduledJob.findMany({
       include: { tech: true },
