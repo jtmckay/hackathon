@@ -28,7 +28,6 @@ export class TelegramService {
     return process.env.OPS_CHANNEL_ID || '';
   }
 
-  /** Resolve which channel type a chat belongs to */
   resolveChannel(chatId: string): 'ops' | 'customer' | 'unified' {
     if (!this.multiChannelEnabled) return 'unified';
     if (chatId === this.opsChannelId) return 'ops';
@@ -36,7 +35,6 @@ export class TelegramService {
     return 'unified';
   }
 
-  /** Is this message from a known group/channel? */
   isKnownChat(chatId: string): boolean {
     if (!this.multiChannelEnabled) {
       return chatId === this.groupChatId;
@@ -49,12 +47,12 @@ export class TelegramService {
       this.logger.warn('GROUP_CHAT_ID not set');
       return;
     }
-    await this.bot.telegram.sendMessage(this.groupChatId, message, { parse_mode: 'Markdown' });
+    await this.bot.telegram.sendMessage(this.groupChatId, message);
   }
 
   async sendToOps(message: string) {
     if (this.multiChannelEnabled && this.opsChannelId) {
-      await this.bot.telegram.sendMessage(this.opsChannelId, message, { parse_mode: 'Markdown' });
+      await this.bot.telegram.sendMessage(this.opsChannelId, message);
     } else {
       await this.sendToGroup(message);
     }
@@ -62,7 +60,7 @@ export class TelegramService {
 
   async sendToCustomer(message: string) {
     if (this.multiChannelEnabled && this.customerChannelId) {
-      await this.bot.telegram.sendMessage(this.customerChannelId, message, { parse_mode: 'Markdown' });
+      await this.bot.telegram.sendMessage(this.customerChannelId, message);
     } else {
       await this.sendToGroup(message);
     }
@@ -82,16 +80,17 @@ export class TelegramService {
       ? `${data.customerName} (NEW)`
       : `${data.customerName} (${data.customerTier} — customer since ${data.customerSince})`;
 
-    const message =
-      `🚨 *EMERGENCY INCOMING*\n` +
-      `Severity: *${data.severity}*\n` +
-      `Customer: ${customerLabel}\n` +
-      `Address: ${data.address || 'Collecting...'}\n` +
-      `Issue: ${data.issue}\n` +
-      `Safety concerns: ${data.safetyConcerns || 'none'}\n` +
-      `Status: Qualifying — awaiting dispatch decision`;
+    const lines = [
+      '🚨 EMERGENCY INCOMING',
+      `Severity: ${data.severity}`,
+      `Customer: ${customerLabel}`,
+      `Address: ${data.address || 'Collecting...'}`,
+      `Issue: ${data.issue}`,
+      `Safety concerns: ${data.safetyConcerns || 'none'}`,
+      `Status: Qualifying — awaiting dispatch decision`,
+    ];
 
-    await this.sendToOps(message);
+    await this.sendToOps(lines.join('\n'));
     this.logger.log(`Emergency alert posted: ${data.severity} — ${data.issue}`);
   }
 
@@ -110,12 +109,15 @@ export class TelegramService {
       grouped[name].push(job);
     }
 
-    const lines = [`📋 *Today's Schedule*\n`];
+    const lines = ['📋 Today\'s Schedule\n'];
     for (const [techName, techJobs] of Object.entries(grouped)) {
-      lines.push(`*${techName}:*`);
+      lines.push(`${techName}:`);
       for (const job of techJobs) {
-        const status = job.status === 'scheduled' ? '⏳' : job.status === 'in_progress' ? '🔧' : job.status === 'completed' ? '✅' : '⚠️';
-        lines.push(`  ${status} ${job.time} — ${job.type} @ ${job.customerName}${job.bumpable ? ' [bumpable]' : ''}`);
+        const icon =
+          job.status === 'scheduled' ? '⏳' :
+          job.status === 'in_progress' ? '🔧' :
+          job.status === 'completed' ? '✅' : '⚠️';
+        lines.push(`  ${icon} ${job.time} — ${job.type} @ ${job.customerName}${job.bumpable ? ' [bumpable]' : ''}`);
       }
       lines.push('');
     }
