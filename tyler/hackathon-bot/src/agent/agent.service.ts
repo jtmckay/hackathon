@@ -294,8 +294,12 @@ export class AgentService {
     // Detect operator dispatch commands — force tool use so Claude can't just say "dispatching" as text
     const DISPATCH_KEYWORDS = /\b(proceed|dispatch|send|go ahead|approve|approved|yes proceed|have .+ respond|get .+ out there)\b/i;
     const isOperatorDispatchCommand = channel === 'ops' && DISPATCH_KEYWORDS.test(userMessage);
+
+    // Force tool use when: operator dispatch command, OR customer alert is active but dispatch hasn't fired
+    // This prevents Claude from just chatting when it should be dispatching
+    const isPendingDispatch = (channel === 'customer') && this.alertFired.has(channelId) && !this.dispatchFired.has(channelId);
     const toolChoice: Anthropic.Messages.ToolChoiceAuto | Anthropic.Messages.ToolChoiceAny =
-      isOperatorDispatchCommand
+      (isOperatorDispatchCommand || isPendingDispatch)
         ? { type: 'any' }   // must call at least one tool
         : { type: 'auto' }; // default
 
@@ -328,10 +332,10 @@ export class AgentService {
               if (!this.alertFired.has(channelId)) {
                 emergencyAlert = block.input as EmergencyAlertData;
                 this.alertFired.add(channelId);
-                toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Alert posted to ops. Now reply to the customer — reassure them someone is being dispatched, continue qualifying if address not yet confirmed.' });
+                toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Alert posted to ops. If the customer has already given their address, call dispatch_tech AND handle_cascade RIGHT NOW in this same response — do not wait for another message. If address is still missing, ask for it immediately with one direct question.' });
               } else {
-                // Already fired — skip silently
-                toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Alert already posted for this incident. Continue conversation.' });
+                // Already fired — dispatch is pending, push Claude to close it out
+                toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Alert already posted. The customer is waiting. Call dispatch_tech AND handle_cascade NOW — you have the address and the tech roster. Do not ask any more questions.' });
               }
               break;
 
@@ -350,7 +354,7 @@ export class AgentService {
 
             case 'handle_cascade':
               cascade = block.input as CascadeData;
-              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Cascade logged. Now reply in this channel — brief confirmation appropriate to who you are talking to.' });
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Cascade logged. Now reply to the person you are talking to — if this is a customer channel, confirm who is coming and their ETA. If ops/tech, give a brief one-line status.' });
               break;
 
             case 'complete_job':
@@ -405,8 +409,14 @@ export class AgentService {
           .filter(b => b.type === 'text')
           .map(b => (b as Anthropic.TextBlock).text)
           .join('');
+
+        if (!finalResponse.trim()) {
+          finalResponse = 'On it.';
+          this.logger.warn(`Empty non-tool response from Claude — used fallback for channelId ${channelId}`);
+        }
       }
 
+      this.logger.log(`Response ready [${channelId}]: "${finalResponse.slice(0, 80)}${finalResponse.length > 80 ? '...' : ''}"`);
       history.push({ role: 'assistant', content: finalResponse });
       if (history.length > 20) {
         const trimmed = history.slice(-20);

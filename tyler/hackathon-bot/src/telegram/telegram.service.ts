@@ -43,6 +43,8 @@ export class TelegramService {
       if (chatId === this.operatorGroupId) return 'operator';
       if (chatId === this.customerGroupId) return 'customer';
       if (chatId === this.techGroupId) return 'tech';
+      // DMs have positive chat IDs — treat as customer when DMs are enabled
+      if (process.env.ALLOW_CUSTOMER_DMS === 'true' && !chatId.startsWith('-')) return 'customer';
       return 'unknown';
     }
     // Single-channel fallback — treat the unified group as operator
@@ -54,24 +56,55 @@ export class TelegramService {
     return this.resolveChannel(chatId) !== 'unknown';
   }
 
+  // ─── Active DM customer tracking ──────────────────────────────────────────
+
+  /** Chat IDs of DM customers who have sent a message recently — receive customer fan-out */
+  private activeDmCustomerIds: Set<string> = new Set();
+
+  registerDmCustomer(chatId: string): void {
+    this.activeDmCustomerIds.add(chatId);
+  }
+
+  clearDmCustomers(): void {
+    this.activeDmCustomerIds.clear();
+  }
+
   // ─── Send helpers ──────────────────────────────────────────────────────────
+
+  /** Guard: never send an empty message to Telegram — logs and skips instead of throwing 400 */
+  private safeText(message: string, fallback = '.'): string {
+    const stripped = message?.trim();
+    if (!stripped) {
+      this.logger.warn(`safeText: empty message intercepted — using fallback "${fallback}"`);
+      return fallback;
+    }
+    return stripped;
+  }
 
   async sendToOperator(message: string): Promise<void> {
     const target = this.multiChannelEnabled ? this.operatorGroupId : this.groupChatId;
     if (!target) { this.logger.warn('No operator channel configured'); return; }
-    await this.bot.telegram.sendMessage(target, message);
+    await this.bot.telegram.sendMessage(target, this.safeText(message));
   }
 
   async sendToCustomer(message: string): Promise<void> {
+    const text = this.safeText(message);
     const target = this.multiChannelEnabled ? this.customerGroupId : this.groupChatId;
-    if (!target) { this.logger.warn('No customer channel configured'); return; }
-    await this.bot.telegram.sendMessage(target, message);
+    if (target) {
+      await this.bot.telegram.sendMessage(target, text).catch(e => this.logger.warn(`sendToCustomer group failed: ${e.message}`));
+    } else {
+      this.logger.warn('No customer channel configured');
+    }
+    // Also fan out to any active DM customers
+    for (const dmId of this.activeDmCustomerIds) {
+      await this.bot.telegram.sendMessage(dmId, text).catch(e => this.logger.warn(`sendToCustomer DM ${dmId} failed: ${e.message}`));
+    }
   }
 
   async sendToTech(message: string): Promise<void> {
     const target = this.multiChannelEnabled ? this.techGroupId : this.groupChatId;
     if (!target) { this.logger.warn('No tech channel configured'); return; }
-    await this.bot.telegram.sendMessage(target, message);
+    await this.bot.telegram.sendMessage(target, this.safeText(message));
   }
 
   /** Legacy alias — ops = operator */
@@ -82,7 +115,7 @@ export class TelegramService {
   /** Send a message to a specific chat by ID */
   async sendToChat(chatId: string, message: string): Promise<void> {
     if (!chatId) return;
-    await this.bot.telegram.sendMessage(chatId, message);
+    await this.bot.telegram.sendMessage(chatId, this.safeText(message));
   }
 
   // ─── Structured ops posts ──────────────────────────────────────────────────

@@ -98,6 +98,7 @@ export class TelegramUpdate {
     await this.seed.resetAndSeed();
     this.agent.clearHistory();
     this.processingChats.clear();
+    this.telegram.clearDmCustomers();
     await ctx.reply('Reset complete.\n\n' + await this.telegram.postSchedule());
   }
 
@@ -175,10 +176,10 @@ export class TelegramUpdate {
         }
       }
 
-      await ctx.reply(stripMarkdown(result.response));
+      await ctx.reply(stripMarkdown(result.response) || 'Got your photo. On it.');
     } catch (error) {
       this.logger.error(`Photo handler error [${channelType}]: ${error.message}`);
-      await ctx.reply("Got your photo. Let me take a look — can you also describe what's happening in a message?");
+      await ctx.reply("Got your photo. Let me take a look — can you also describe what's happening in a message?").catch(() => {});
     } finally {
       clearInterval(typingInterval);
       this.processingChats.delete(chatId);
@@ -204,6 +205,11 @@ export class TelegramUpdate {
 
     const senderName = message.from?.first_name || 'User';
 
+    // Track DM customers so fan-out messages reach them too
+    if (channelType === 'customer' && !chatId.startsWith('-')) {
+      this.telegram.registerDmCustomer(chatId);
+    }
+
     // Map channel type to agent prompt type
     const agentChannel =
       channelType === 'customer' ? 'customer' :
@@ -215,7 +221,15 @@ export class TelegramUpdate {
     await ctx.sendChatAction('typing').catch(() => {});
     const typingInterval = setInterval(() => ctx.sendChatAction('typing').catch(() => {}), 4000);
 
-    try {
+    const MAX_ATTEMPTS = 3;
+    let lastError: Error | undefined;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        if (attempt > 1) {
+          this.logger.log(`[retry] Attempt ${attempt}/${MAX_ATTEMPTS} for ${chatId} (${channelType})`);
+        }
+
       const result = await this.agent.chat(
         chatId,
         agentChannel,
@@ -248,16 +262,38 @@ export class TelegramUpdate {
 
       // ── Dispatch → update DB, post to operator + tech ────────────────────
       if (result.dispatchDecision) {
-        const d = result.dispatchDecision;
+        let d = result.dispatchDecision;
         this.logger.log(`Dispatch: ${d.selectedTechName}`);
 
-        const { pausedJobId } = await this.schedule.assignEmergency(d.selectedTechId, {
-          type: d.emergencyJobType || 'emergency_response',
-          address: d.emergencyAddress,
-          customerName: d.customerName,
-          durationHrs: 2,
-          notes: d.issueDescription,
-        });
+        // Validate tech ID — fall back to first available if Claude hallucinated an ID
+        let pausedJobId: string | undefined;
+        try {
+          const assigned = await this.schedule.assignEmergency(d.selectedTechId, {
+            type: d.emergencyJobType || 'emergency_response',
+            address: d.emergencyAddress,
+            customerName: d.customerName,
+            durationHrs: 2,
+            notes: d.issueDescription,
+          });
+          pausedJobId = assigned.pausedJobId;
+        } catch (assignErr) {
+          this.logger.warn(`assignEmergency failed for techId "${d.selectedTechId}" — falling back to first available: ${assignErr.message}`);
+          const fallback = await this.schedule.getFirstAvailableTech();
+          if (!fallback) {
+            this.logger.error('No available tech found for fallback dispatch');
+            throw assignErr;
+          }
+          this.logger.log(`Fallback dispatch → ${fallback.name} (${fallback.id})`);
+          d = { ...d, selectedTechId: fallback.id, selectedTechName: fallback.name };
+          const assigned = await this.schedule.assignEmergency(d.selectedTechId, {
+            type: d.emergencyJobType || 'emergency_response',
+            address: d.emergencyAddress,
+            customerName: d.customerName,
+            durationHrs: 2,
+            notes: d.issueDescription,
+          });
+          pausedJobId = assigned.pausedJobId;
+        }
 
         const idsToDisplace = (d.futureTechJobIds || []).filter(id => id !== pausedJobId);
         await this.schedule.markJobsDisplaced(idsToDisplace);
@@ -364,14 +400,29 @@ export class TelegramUpdate {
       }
 
       // ── Reply in the originating channel ──────────────────────────────────
-      await ctx.reply(stripMarkdown(result.response));
+      const replyText = stripMarkdown(result.response) || 'On it.';
+      await ctx.reply(replyText);
+
+      // Success — exit retry loop
+      lastError = undefined;
+      break;
 
     } catch (error) {
-      this.logger.error(`Error [${channelType}]: ${error.message}`);
-      await ctx.reply('Sorry, I ran into an issue. Please try again.');
-    } finally {
-      clearInterval(typingInterval);
-      this.processingChats.delete(chatId);
+      lastError = error;
+      this.logger.error(`Error [${channelType}] attempt ${attempt}/${MAX_ATTEMPTS}: ${error.message}`);
+      if (attempt < MAX_ATTEMPTS) {
+        this.logger.log(`[retry] Waiting 1s before attempt ${attempt + 1}...`);
+        await new Promise(r => setTimeout(r, 1000));
+      }
     }
+    } // end retry loop
+
+    if (lastError) {
+      this.logger.error(`All ${MAX_ATTEMPTS} attempts failed for ${chatId}: ${lastError.message}`);
+      await ctx.reply('Sorry, I ran into an issue. Please try again.').catch(() => {});
+    }
+
+    clearInterval(typingInterval);
+    this.processingChats.delete(chatId);
   }
 }
