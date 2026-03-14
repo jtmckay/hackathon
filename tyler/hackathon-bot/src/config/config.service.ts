@@ -13,6 +13,7 @@ export class BusinessConfigService implements OnModuleInit {
   customers: any[];
   schedule: any[];
   jobCatalog: any[];
+  driveTimeMinutes: Record<string, number>;
 
   onModuleInit() {
     this.loadAll();
@@ -25,6 +26,7 @@ export class BusinessConfigService implements OnModuleInit {
     this.customers = this.loadFile('customers.json').customers;
     this.schedule = this.loadFile('schedule.json').schedule;
     this.jobCatalog = this.loadFile('job-catalog.json').jobCatalog;
+    this.driveTimeMinutes = this.loadFile('drive-times.json').driveTimeMinutes;
 
     this.logger.log(`Loaded config: ${this.techs.length} techs, ${this.customers.length} customers, ${this.schedule.length} jobs, ${this.jobCatalog.length} catalog items`);
   }

@@ -1,0 +1,21 @@
+{
+  "description": "Estimated drive time in minutes between service zones (demo values, not GPS)",
+  "driveTimeMinutes": {
+    "north-north": 5,
+    "north-south": 25,
+    "north-east": 20,
+    "north-west": 20,
+    "south-north": 25,
+    "south-south": 5,
+    "south-east": 20,
+    "south-west": 20,
+    "east-north": 20,
+    "east-south": 20,
+    "east-east": 5,
+    "east-west": 25,
+    "west-north": 20,
+    "west-south": 20,
+    "west-east": 25,
+    "west-west": 5
+  }
+}
