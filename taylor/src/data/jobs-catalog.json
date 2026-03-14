@@ -1,0 +1,18 @@
+{
+  "emergency": [
+    { "type": "Pipe burst repair", "priceRange": [200, 500], "durationRange": [1, 3], "minSeniority": "mid", "requiredCerts": [] },
+    { "type": "Gas leak diagnosis", "priceRange": [150, 300], "durationRange": [1, 2], "minSeniority": "senior", "requiredCerts": ["gas certified"] },
+    { "type": "Sewage backup", "priceRange": [250, 600], "durationRange": [2, 4], "minSeniority": "mid", "requiredCerts": [] },
+    { "type": "Water heater emergency", "priceRange": [200, 400], "durationRange": [1, 3], "minSeniority": "mid", "requiredCerts": [] },
+    { "type": "Active flooding/ceiling leak", "priceRange": [200, 600], "durationRange": [1, 4], "minSeniority": "mid", "requiredCerts": [] }
+  ],
+  "routine": [
+    { "type": "Drain clearing", "priceRange": [150, 250], "durationRange": [1, 2], "minSeniority": "any", "requiredCerts": [] },
+    { "type": "Faucet repair", "priceRange": [100, 300], "durationRange": [1, 2], "minSeniority": "any", "requiredCerts": [] },
+    { "type": "Toilet repair/replace", "priceRange": [150, 400], "durationRange": [1, 3], "minSeniority": "any", "requiredCerts": [] },
+    { "type": "Water heater install", "priceRange": [800, 1500], "durationRange": [3, 5], "minSeniority": "senior", "requiredCerts": [] },
+    { "type": "Water softener service", "priceRange": [100, 200], "durationRange": [1, 2], "minSeniority": "any", "requiredCerts": [] },
+    { "type": "Consultation/quote", "priceRange": [0, 0], "durationRange": [0.5, 1], "minSeniority": "any", "requiredCerts": [] }
+  ],
+  "afterHoursSurcharge": 150
+}

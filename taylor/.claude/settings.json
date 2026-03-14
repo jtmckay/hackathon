@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__playwright__*",
+      "Bash(cargo *)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npm start:*)",
+      "Bash(npm test:*)",
+      "Bash(npx vite:*)",
+      "Bash(npx playwright:*)",
+      "Grep",
+      "Write",
+      "Edit",
+      "Bash(magick:*)"
+    ]
+  }
+}

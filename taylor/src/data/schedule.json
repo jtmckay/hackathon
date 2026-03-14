@@ -1,0 +1,121 @@
+{
+  "date": "2026-03-16",
+  "jobs": [
+    {
+      "id": 1,
+      "techId": "marcus",
+      "time": "08:00",
+      "durationHrs": 3,
+      "type": "Water heater install",
+      "customerId": "garcia",
+      "address": "1284 Maple Dr, Lehi, UT 84043",
+      "status": "scheduled",
+      "notes": "VIP customer — requested Marcus specifically",
+      "bumpable": false
+    },
+    {
+      "id": 2,
+      "techId": "marcus",
+      "time": "12:00",
+      "durationHrs": 2,
+      "type": "Gas leak diagnosis",
+      "customerId": "chen",
+      "address": "567 Oak Ave, American Fork, UT 84003",
+      "status": "scheduled",
+      "notes": "Customer reported faint gas smell near water heater. Marcus only — gas certified.",
+      "bumpable": false
+    },
+    {
+      "id": 3,
+      "techId": "tyler",
+      "time": "08:00",
+      "durationHrs": 1.5,
+      "type": "Drain clearing",
+      "customerId": "ramirez",
+      "address": "234 Pine Rd, Provo, UT 84601",
+      "status": "scheduled",
+      "notes": "Kitchen drain backing up. Routine job.",
+      "bumpable": true
+    },
+    {
+      "id": 4,
+      "techId": "tyler",
+      "time": "10:00",
+      "durationHrs": 2,
+      "type": "Toilet repair/replace",
+      "customerId": "patterson",
+      "address": "890 Elm St, Orem, UT 84057",
+      "status": "scheduled",
+      "notes": "Running toilet, likely flapper valve. VIP customer.",
+      "bumpable": true
+    },
+    {
+      "id": 5,
+      "techId": "tyler",
+      "time": "13:00",
+      "durationHrs": 1.5,
+      "type": "Faucet repair",
+      "customerId": "thorpe",
+      "address": "456 Cedar Ln, Pleasant Grove, UT 84062",
+      "status": "scheduled",
+      "notes": "Leaky kitchen faucet. Customer is flexible on timing.",
+      "bumpable": true
+    },
+    {
+      "id": 6,
+      "techId": "jake",
+      "time": "08:00",
+      "durationHrs": 2,
+      "type": "Drain clearing",
+      "customerId": "park",
+      "address": "789 Birch Way, Lindon, UT 84042",
+      "status": "scheduled",
+      "notes": "Bathroom drain slow. Jake is fastest on drains.",
+      "bumpable": true
+    },
+    {
+      "id": 7,
+      "techId": "jake",
+      "time": "13:00",
+      "durationHrs": 2,
+      "type": "Water softener service",
+      "customerId": "foster",
+      "address": "852 Spruce Blvd, American Fork, UT 84003",
+      "status": "scheduled",
+      "notes": "Annual water softener maintenance. Long-time customer.",
+      "bumpable": true
+    },
+    {
+      "id": 8,
+      "techId": "danny",
+      "time": "09:00",
+      "durationHrs": 2,
+      "type": "Faucet repair",
+      "customerId": "johnson",
+      "address": "321 Aspen Ct, Saratoga Springs, UT 84045",
+      "status": "scheduled",
+      "notes": "Simple faucet swap. Good learning job for Danny.",
+      "bumpable": true
+    }
+  ],
+  "flexSlots": [
+    {
+      "id": "flex-am",
+      "tech": null,
+      "time": "11:00",
+      "duration_hrs": 1,
+      "type": "FLEX_BUFFER",
+      "status": "available",
+      "notes": "Morning emergency buffer — held open by design"
+    },
+    {
+      "id": "flex-pm",
+      "tech": null,
+      "time": "14:30",
+      "duration_hrs": 1,
+      "type": "FLEX_BUFFER",
+      "status": "available",
+      "notes": "Afternoon emergency buffer — held open by design"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "warranty": {
+    "standardDays": 30,
+    "description": "30-day workmanship warranty on all repairs"
+  },
+  "callbacks": {
+    "withinWarranty": "no charge",
+    "outsideWarranty": "standard diagnostic fee applies"
+  },
+  "afterHours": {
+    "hours": "before 7am or after 6pm",
+    "surcharge": 150
+  },
+  "cancellation": {
+    "notice": "24 hours",
+    "fee": 0,
+    "lateCancel": "50% of estimated service cost"
+  },
+  "payment": {
+    "terms": "due on completion",
+    "methods": ["cash", "check", "card"],
+    "netTermsForCommercial": 30
+  },
+  "emergencyResponse": {
+    "guarantee": "same-day, no exceptions",
+    "dispatchTarget": "within 30 minutes of call"
+  }
+}

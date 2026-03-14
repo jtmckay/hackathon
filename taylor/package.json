@@ -1,0 +1,23 @@
+{
+  "name": "shamrock-plumbing-dispatch",
+  "version": "1.0.0",
+  "description": "AI-powered dispatch and operations management for Shamrock Plumbing",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.4.7",
+    "telegraf": "^4.16.3",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "vitest": "^3.0.9"
+  }
+}
