@@ -315,11 +315,15 @@ export class AgentService {
         for (const block of toolBlocks) {
           switch (block.name) {
             case 'post_emergency_alert':
+              // Only fire once per channel — prevents duplicate alerts as info improves
               if (!this.alertFired.has(channelId)) {
                 emergencyAlert = block.input as EmergencyAlertData;
                 this.alertFired.add(channelId);
+                toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Alert posted to ops. Now reply to the customer — reassure them someone is being dispatched, continue qualifying if address not yet confirmed.' });
+              } else {
+                // Already fired — skip silently
+                toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Alert already posted for this incident. Continue conversation.' });
               }
-              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Alert posted to ops. Now reply to the customer — continue qualifying, ask the next question.' });
               break;
 
             case 'dispatch_tech':
@@ -405,6 +409,133 @@ export class AgentService {
     } catch (error) {
       this.logger.error(`Claude API error: ${error.message}`);
       throw error;
+    }
+  }
+
+  /**
+   * Process a photo message — analyze with Claude vision, return the response.
+   * The image URL (Telegram CDN) is passed directly to the Anthropic API.
+   */
+  async chatWithImage(
+    channelId: string,
+    channel: 'customer' | 'ops' | 'tech',
+    senderName: string,
+    imageUrl: string,
+    caption?: string,
+  ): Promise<ChatResult> {
+    const systemPrompt = await this.systemPromptBuilder.build(channel);
+
+    if (!this.conversationHistory.has(channelId)) {
+      this.conversationHistory.set(channelId, []);
+    }
+    const history = this.conversationHistory.get(channelId);
+    const recentHistory = history.slice(-20);
+
+    const tools = channel === 'tech'
+      ? [CASCADE_TOOL, COMPLETE_JOB_TOOL, CALLBACK_TOOL]
+      : ALL_TOOLS;
+
+    const userContent: Anthropic.MessageParam['content'] = [
+      {
+        type: 'image',
+        source: { type: 'url', url: imageUrl },
+      },
+      {
+        type: 'text',
+        text: `[${senderName}]: [sent a photo]${caption ? ` — caption: "${caption}"` : ''}\n\nAnalyze this image in the context of a plumbing service call. Describe what you see, assess the severity, and respond as the Shamrock Plumbing dispatcher. If this shows a plumbing emergency, treat it as such and call the appropriate tools.`,
+      },
+    ];
+
+    try {
+      const firstResponse = await this.client.messages.create({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: [
+          ...recentHistory.map(m => ({ role: m.role, content: m.content })),
+          { role: 'user' as const, content: userContent },
+        ],
+        tools,
+      });
+
+      let emergencyAlert: EmergencyAlertData | undefined;
+      let dispatchDecision: DispatchDecisionData | undefined;
+      let escalateToBlake: EscalationData | undefined;
+      let cascade: CascadeData | undefined;
+      let completeJob: CompleteJobData | undefined;
+      let callbackAlert: CallbackAlertData | undefined;
+      let finalResponse: string;
+
+      if (firstResponse.stop_reason === 'tool_use') {
+        const toolBlocks = firstResponse.content.filter(b => b.type === 'tool_use') as Anthropic.ToolUseBlock[];
+        const toolResults: Anthropic.ToolResultBlockParam[] = [];
+
+        for (const block of toolBlocks) {
+          switch (block.name) {
+            case 'post_emergency_alert':
+              if (!this.alertFired.has(channelId)) {
+                emergencyAlert = block.input as EmergencyAlertData;
+                this.alertFired.add(channelId);
+              }
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Alert posted. Now reply to the customer about what you see in their photo and what they should do next.' });
+              break;
+            default:
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Done. Now reply to the customer about what you see in the photo.' });
+          }
+        }
+
+        const secondResponse = await this.client.messages.create({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1024,
+          system: systemPrompt + '\n\nIMPORTANT: You MUST write a plain text reply. Describe what you see in the photo and give the customer actionable next steps.',
+          messages: [
+            ...recentHistory.map(m => ({ role: m.role, content: m.content })),
+            { role: 'assistant' as const, content: firstResponse.content },
+            { role: 'user' as const, content: toolResults },
+          ],
+        });
+
+        finalResponse = secondResponse.content
+          .filter(b => b.type === 'text')
+          .map(b => (b as Anthropic.TextBlock).text)
+          .join('') || 'I can see the issue in your photo. Getting a tech to you now.';
+      } else {
+        finalResponse = firstResponse.content
+          .filter(b => b.type === 'text')
+          .map(b => (b as Anthropic.TextBlock).text)
+          .join('') || 'Got your photo. Looking at this now.';
+      }
+
+      // Store as text in history so future turns have context
+      history.push({ role: 'user', content: `[${senderName}]: [sent a photo${caption ? ` — ${caption}` : ''}]` });
+      history.push({ role: 'assistant', content: finalResponse });
+      if (history.length > 20) {
+        const trimmed = history.slice(-20);
+        history.length = 0;
+        history.push(...trimmed);
+      }
+
+      return { response: finalResponse, emergencyAlert, dispatchDecision, escalateToBlake, cascade, completeJob, callbackAlert };
+    } catch (error) {
+      this.logger.error(`Claude vision API error: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Inject a message directly into a channel's conversation history.
+   * Used to sync cross-channel events (e.g. emergency from customer channel → operator context).
+   */
+  injectMessage(channelId: string, role: 'user' | 'assistant', content: string) {
+    if (!this.conversationHistory.has(channelId)) {
+      this.conversationHistory.set(channelId, []);
+    }
+    const history = this.conversationHistory.get(channelId);
+    history.push({ role, content });
+    if (history.length > 20) {
+      const trimmed = history.slice(-20);
+      history.length = 0;
+      history.push(...trimmed);
     }
   }
 

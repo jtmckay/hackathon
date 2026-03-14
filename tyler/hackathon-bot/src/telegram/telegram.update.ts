@@ -1,4 +1,5 @@
-import { Update, Ctx, Start, Command, On } from 'nestjs-telegraf';
+import { Update, Ctx, Start, Command, On, InjectBot } from 'nestjs-telegraf';
+import { Telegraf } from 'telegraf';
 import { Context } from 'telegraf';
 import { Logger } from '@nestjs/common';
 import { AgentService } from '../agent/agent.service';
@@ -26,6 +27,7 @@ export class TelegramUpdate {
   private processingChats: Set<string> = new Set();
 
   constructor(
+    @InjectBot() private bot: Telegraf<Context>,
     private agent: AgentService,
     private telegram: TelegramService,
     private seed: SeedService,
@@ -122,6 +124,67 @@ export class TelegramUpdate {
     return lines.join('\n');
   }
 
+  @On('photo')
+  async onPhoto(@Ctx() ctx: Context) {
+    const message = ctx.message as any;
+    const chatId = String(ctx.chat.id);
+    const channelType = this.telegram.resolveChannel(chatId);
+    if (channelType === 'unknown') return;
+
+    if (this.processingChats.has(chatId)) return;
+
+    const senderName = message.from?.first_name || 'Customer';
+    const agentChannel = channelType === 'customer' ? 'customer' : channelType === 'tech' ? 'tech' : 'ops';
+    const caption = message.caption || '';
+
+    this.logger.log(`[${channelType}] ${senderName}: [photo]${caption ? ` — "${caption}"` : ''}`);
+
+    this.processingChats.add(chatId);
+    await ctx.sendChatAction('typing').catch(() => {});
+    const typingInterval = setInterval(() => ctx.sendChatAction('typing').catch(() => {}), 4000);
+
+    try {
+      // Get the highest-res photo from Telegram
+      const photos = message.photo as any[];
+      const bestPhoto = photos[photos.length - 1];
+      const fileInfo = await this.bot.telegram.getFile(bestPhoto.file_id);
+      const imageUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${fileInfo.file_path}`;
+
+      const result = await this.agent.chatWithImage(chatId, agentChannel, senderName, imageUrl, caption);
+
+      // Forward photo + analysis to operator channel (if message came from customer or tech)
+      if (channelType === 'customer' || channelType === 'tech') {
+        const operatorId = this.telegram.operatorGroupId;
+        if (operatorId && operatorId !== chatId) {
+          await this.bot.telegram.forwardMessage(Number(operatorId), Number(chatId), message.message_id);
+          await this.telegram.sendToOperator(`Photo analysis (from ${senderName}):\n${result.response}`);
+        }
+      }
+
+      // Handle any tools that fired (same as text handler)
+      if (result.emergencyAlert) {
+        const ea = result.emergencyAlert;
+        await this.telegram.postEmergencyAlert(ea);
+        const operatorId = this.telegram.operatorGroupId;
+        if (operatorId) {
+          this.agent.injectMessage(operatorId, 'assistant',
+            `EMERGENCY INCOMING — ${ea.severity}\nCustomer: ${ea.customerName}${ea.address ? ` at ${ea.address}` : ''}\nIssue: ${ea.issue}\nSafety: ${ea.safetyConcerns || 'none'}\nPhoto has been forwarded. Say "proceed" or "send [tech name]" to dispatch.`);
+        }
+        if (channelType === 'customer') {
+          await this.telegram.sendToCustomer("Got your photo — I can see the issue. I'm getting a tech dispatched to you right now. Sit tight.");
+        }
+      }
+
+      await ctx.reply(stripMarkdown(result.response));
+    } catch (error) {
+      this.logger.error(`Photo handler error [${channelType}]: ${error.message}`);
+      await ctx.reply("Got your photo. Let me take a look — can you also describe what's happening in a message?");
+    } finally {
+      clearInterval(typingInterval);
+      this.processingChats.delete(chatId);
+    }
+  }
+
   @On('text')
   async onMessage(@Ctx() ctx: Context) {
     const message = ctx.message as any;
@@ -161,8 +224,26 @@ export class TelegramUpdate {
 
       // ── Emergency alert → operator only ──────────────────────────────────
       if (result.emergencyAlert) {
-        this.logger.log(`Emergency: ${result.emergencyAlert.severity}`);
-        await this.telegram.postEmergencyAlert(result.emergencyAlert);
+        const ea = result.emergencyAlert;
+        this.logger.log(`Emergency: ${ea.severity}`);
+        await this.telegram.postEmergencyAlert(ea);
+
+        // Inject into operator channel history so the operator agent can act on it
+        const operatorId = this.telegram.operatorGroupId;
+        if (operatorId) {
+          this.agent.injectMessage(
+            operatorId,
+            'assistant',
+            `EMERGENCY INCOMING — ${ea.severity}\nCustomer: ${ea.customerName}${ea.address ? ` at ${ea.address}` : ''}\nIssue: ${ea.issue}\nSafety: ${ea.safetyConcerns || 'none'}\nStatus: Qualifying — awaiting dispatch decision.\nAll tech details and schedule are available. Say "proceed" or "send [tech name]" to dispatch immediately.`,
+          );
+        }
+
+        // Heartbeat to customer — they hear something immediately while operator deliberates
+        if (channelType === 'customer') {
+          await this.telegram.sendToCustomer(
+            "Got it — your situation has been flagged and I'm working on getting a tech to you right now. Sit tight, I'll confirm who's coming and when in just a moment.",
+          );
+        }
       }
 
       // ── Dispatch → update DB, post to operator + tech ────────────────────
@@ -182,6 +263,22 @@ export class TelegramUpdate {
         await this.schedule.markJobsDisplaced(idsToDisplace);
 
         const displaced = await this.schedule.getDisplacedJobs(d.selectedTechId);
+
+        // Inject dispatch into operator history
+        const operatorId = this.telegram.operatorGroupId;
+        if (operatorId) {
+          this.agent.injectMessage(
+            operatorId,
+            'assistant',
+            `DISPATCHED: ${d.selectedTechName} → ${d.customerName} at ${d.emergencyAddress}. ETA ~${d.estimatedDriveMinutes} min. Reason: ${d.selectionReason}`,
+          );
+        }
+
+        // Confirmed ETA to customer as soon as dispatch fires
+        const techFirstName = d.selectedTechName.split(' ')[0];
+        await this.telegram.sendToCustomer(
+          `Good news — ${techFirstName} is heading your way now. Estimated arrival: about ${d.estimatedDriveMinutes} minutes. He'll call when he's 5 minutes out.`,
+        );
 
         // Decision summary → operator
         await this.telegram.postDispatchDecision(d, displaced);
