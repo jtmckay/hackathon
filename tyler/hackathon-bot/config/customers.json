@@ -1,0 +1,106 @@
+{
+  "customers": [
+    {
+      "id": "cust-martinez",
+      "name": "Elena Martinez",
+      "phone": "(555) 301-0001",
+      "email": "elena.martinez@email.com",
+      "address": "1247 Oak Street, North District",
+      "zone": "north",
+      "valueTier": "platinum",
+      "lifetimeValue": 12500,
+      "jobHistory": 18,
+      "paymentStatus": "current",
+      "notes": "Long-time customer. Referred 3 neighbors. Prefers morning appointments."
+    },
+    {
+      "id": "cust-thompson",
+      "name": "Robert Thompson",
+      "phone": "(555) 301-0002",
+      "email": "rthompson@email.com",
+      "address": "892 Maple Ave, South Side",
+      "zone": "south",
+      "valueTier": "gold",
+      "lifetimeValue": 6200,
+      "jobHistory": 9,
+      "paymentStatus": "current",
+      "notes": "Commercial property manager. Books quarterly maintenance."
+    },
+    {
+      "id": "cust-chen",
+      "name": "Lisa Chen",
+      "phone": "(555) 301-0003",
+      "address": "3401 Pine Road, East Village",
+      "zone": "east",
+      "valueTier": "standard",
+      "lifetimeValue": 850,
+      "jobHistory": 2,
+      "paymentStatus": "current",
+      "notes": "New customer, just moved to the area."
+    },
+    {
+      "id": "cust-williams",
+      "name": "David Williams",
+      "phone": "(555) 301-0004",
+      "email": "dwilliams@email.com",
+      "address": "567 Cedar Lane, West End",
+      "zone": "west",
+      "valueTier": "gold",
+      "lifetimeValue": 8900,
+      "jobHistory": 14,
+      "paymentStatus": "current",
+      "notes": "Owns two rental properties. Always wants detailed invoices."
+    },
+    {
+      "id": "cust-patel",
+      "name": "Priya Patel",
+      "phone": "(555) 301-0005",
+      "email": "priya.p@email.com",
+      "address": "2100 Birch Street, North District",
+      "zone": "north",
+      "valueTier": "platinum",
+      "lifetimeValue": 15200,
+      "jobHistory": 22,
+      "paymentStatus": "current",
+      "notes": "Restaurant owner. Commercial account. Emergency priority."
+    },
+    {
+      "id": "cust-johnson",
+      "name": "Karen Johnson",
+      "phone": "(555) 301-0006",
+      "address": "445 Elm Court, South Side",
+      "zone": "south",
+      "valueTier": "standard",
+      "lifetimeValue": 1200,
+      "jobHistory": 3,
+      "paymentStatus": "overdue",
+      "notes": "Has an outstanding invoice from last month. Otherwise fine."
+    },
+    {
+      "id": "cust-garcia",
+      "name": "Marco Garcia",
+      "phone": "(555) 301-0007",
+      "email": "mgarcia@email.com",
+      "address": "789 Walnut Blvd, East Village",
+      "zone": "east",
+      "valueTier": "standard",
+      "lifetimeValue": 450,
+      "jobHistory": 1,
+      "paymentStatus": "current",
+      "notes": "First-time customer. Called about a leak."
+    },
+    {
+      "id": "cust-rivera",
+      "name": "Angela Rivera",
+      "phone": "(555) 301-0008",
+      "email": "arivera@email.com",
+      "address": "1560 Spruce Drive, West End",
+      "zone": "west",
+      "valueTier": "gold",
+      "lifetimeValue": 5400,
+      "jobHistory": 8,
+      "paymentStatus": "current",
+      "notes": "Prefers afternoon appointments. Has a dog, please call before arriving."
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 {
+  "allowed_tools": ["bash", "edit", "grep"],
   "permissions": {
     "allow": [
       "mcp__playwright__*",
@@ -13,7 +14,13 @@
       "Bash(npx playwright:*)",
       "Write",
       "Edit",
-      "Bash(magick:*)"
+      "Bash(magick:*)",
+      "Bash(which nest:*)",
+      "Bash(nest new:*)",
+      "Bash(npx prisma:*)",
+      "Bash(ls:*)",
+      "Bash(node:*)",
+      "Bash(npx nest:*)"
     ]
   }
 }

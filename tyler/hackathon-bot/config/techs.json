@@ -1,0 +1,52 @@
+{
+  "techs": [
+    {
+      "id": "tech-mike",
+      "name": "Mike Rodriguez",
+      "phone": "(555) 201-0001",
+      "skills": ["residential", "commercial", "water_heater", "gas_line", "drain", "fixture", "remodel"],
+      "certifications": ["master_plumber", "gas_certified", "backflow_certified"],
+      "zone": "north",
+      "status": "available",
+      "performanceRating": 4.9,
+      "avgJobTime": 0.9,
+      "hourlyRate": 95.0
+    },
+    {
+      "id": "tech-sarah",
+      "name": "Sarah Chen",
+      "phone": "(555) 201-0002",
+      "skills": ["residential", "commercial", "water_heater", "drain", "fixture", "sewer_line", "camera_inspection"],
+      "certifications": ["journeyman_plumber", "backflow_certified"],
+      "zone": "south",
+      "status": "available",
+      "performanceRating": 4.7,
+      "avgJobTime": 1.0,
+      "hourlyRate": 85.0
+    },
+    {
+      "id": "tech-james",
+      "name": "James Park",
+      "phone": "(555) 201-0003",
+      "skills": ["residential", "drain", "fixture", "water_heater"],
+      "certifications": ["journeyman_plumber"],
+      "zone": "east",
+      "status": "available",
+      "performanceRating": 4.3,
+      "avgJobTime": 1.15,
+      "hourlyRate": 75.0
+    },
+    {
+      "id": "tech-carlos",
+      "name": "Carlos Mendez",
+      "phone": "(555) 201-0004",
+      "skills": ["residential", "commercial", "gas_line", "water_heater", "drain", "fixture", "emergency"],
+      "certifications": ["master_plumber", "gas_certified"],
+      "zone": "west",
+      "status": "available",
+      "performanceRating": 4.8,
+      "avgJobTime": 0.95,
+      "hourlyRate": 90.0
+    }
+  ]
+}

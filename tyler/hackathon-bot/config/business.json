@@ -1,0 +1,14 @@
+{
+  "companyName": "Shamrock Plumbing",
+  "ownerName": "Blake",
+  "phone": "(555) 742-8367",
+  "serviceArea": "Metro area — North, South, East, West zones",
+  "afterHoursStart": "18:00",
+  "afterHoursEnd": "07:00",
+  "afterHoursSurcharge": 1.5,
+  "warrantyCallbackWindow": "30 days",
+  "emergencyResponseTarget": "90 minutes",
+  "standardBookingWindow": "4 hours",
+  "cancellationPolicy": "24-hour notice required, otherwise $75 fee",
+  "paymentTerms": "Due on completion, net-30 for commercial accounts"
+}

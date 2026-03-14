@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  telegramId BigInt  @unique
+  username   String?
+  firstName  String?
+  lastName   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions  Session[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  state     String   @default("idle")
+  data      String   @default("{}") // JSON blob for conversation state
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tech {
+  id             String   @id
+  name           String
+  phone          String
+  skills         String   // JSON array
+  certifications String   // JSON array
+  zone           String
+  status         String   @default("available") // available, on_job, sick, off
+  currentJobId   String?
+  performanceRating Float @default(4.5)
+  avgJobTime     Float   @default(1.0) // multiplier vs catalog estimate
+  hourlyRate     Float   @default(85.0)
+  scheduledJobs  ScheduledJob[]
+}
+
+model Customer {
+  id            String   @id
+  name          String
+  phone         String
+  email         String?
+  address       String
+  zone          String
+  valueTier     String   @default("standard") // platinum, gold, standard
+  lifetimeValue Float    @default(0)
+  jobHistory    Int      @default(0)
+  paymentStatus String   @default("current") // current, overdue, collections
+  notes         String?
+  scheduledJobs ScheduledJob[]
+}
+
+model ScheduledJob {
+  id           String   @id
+  techId       String
+  tech         Tech     @relation(fields: [techId], references: [id])
+  customerId   String?
+  customer     Customer? @relation(fields: [customerId], references: [id])
+  time         String   // e.g. "08:00"
+  durationHrs  Float
+  type         String   // from job catalog
+  customerName String
+  address      String
+  status       String   @default("scheduled") // scheduled, in_progress, completed, paused, rescheduled, cancelled
+  bumpable     Boolean  @default(false)
+  notes        String?
+  priority     Int      @default(5) // 1=highest, 10=lowest
+}
+
+model JobCatalog {
+  id              String @id
+  name            String
+  category        String // repair, install, maintenance, emergency
+  basePriceMin    Float
+  basePriceMax    Float
+  estimatedHours  Float
+  requiredSkills  String // JSON array
+  requiredCerts   String // JSON array
+  partsCommon     String // JSON array
+  description     String?
+}
+
+model JobLog {
+  id          Int      @id @default(autoincrement())
+  jobId       String
+  techId      String
+  action      String   // created, started, completed, paused, rescheduled, cancelled
+  details     String?
+  timestamp   DateTime @default(now())
+}

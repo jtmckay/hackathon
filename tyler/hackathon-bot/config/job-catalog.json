@@ -1,0 +1,124 @@
+{
+  "jobCatalog": [
+    {
+      "id": "water_heater_install",
+      "name": "Water Heater Installation",
+      "category": "install",
+      "basePriceMin": 800,
+      "basePriceMax": 2500,
+      "estimatedHours": 2.0,
+      "requiredSkills": ["water_heater"],
+      "requiredCerts": [],
+      "partsCommon": ["water heater unit", "flex connectors", "T&P valve", "expansion tank"],
+      "description": "Full water heater replacement including removal of old unit."
+    },
+    {
+      "id": "gas_line_install",
+      "name": "Gas Line Installation",
+      "category": "install",
+      "basePriceMin": 500,
+      "basePriceMax": 1500,
+      "estimatedHours": 3.0,
+      "requiredSkills": ["gas_line"],
+      "requiredCerts": ["gas_certified"],
+      "partsCommon": ["black iron pipe", "gas valves", "fittings", "thread sealant"],
+      "description": "New gas line run for appliance hookup."
+    },
+    {
+      "id": "drain_cleaning",
+      "name": "Drain Cleaning",
+      "category": "repair",
+      "basePriceMin": 150,
+      "basePriceMax": 400,
+      "estimatedHours": 1.5,
+      "requiredSkills": ["drain"],
+      "requiredCerts": [],
+      "partsCommon": ["drain snake", "auger bits"],
+      "description": "Standard drain clearing for residential drains."
+    },
+    {
+      "id": "commercial_drain_cleaning",
+      "name": "Commercial Drain Cleaning",
+      "category": "repair",
+      "basePriceMin": 300,
+      "basePriceMax": 800,
+      "estimatedHours": 1.5,
+      "requiredSkills": ["commercial", "drain"],
+      "requiredCerts": [],
+      "partsCommon": ["commercial auger", "grease trap cleaner"],
+      "description": "Heavy-duty drain cleaning for commercial kitchens and facilities."
+    },
+    {
+      "id": "sewer_camera_inspection",
+      "name": "Sewer Camera Inspection",
+      "category": "maintenance",
+      "basePriceMin": 200,
+      "basePriceMax": 500,
+      "estimatedHours": 2.5,
+      "requiredSkills": ["sewer_line", "camera_inspection"],
+      "requiredCerts": [],
+      "partsCommon": ["camera head", "locator"],
+      "description": "Video inspection of sewer line to diagnose issues."
+    },
+    {
+      "id": "faucet_repair",
+      "name": "Faucet Repair",
+      "category": "repair",
+      "basePriceMin": 100,
+      "basePriceMax": 250,
+      "estimatedHours": 1.0,
+      "requiredSkills": ["fixture"],
+      "requiredCerts": [],
+      "partsCommon": ["cartridge", "O-rings", "supply lines"],
+      "description": "Repair or rebuild leaking faucet."
+    },
+    {
+      "id": "fixture_install",
+      "name": "Fixture Installation",
+      "category": "install",
+      "basePriceMin": 150,
+      "basePriceMax": 400,
+      "estimatedHours": 1.5,
+      "requiredSkills": ["fixture"],
+      "requiredCerts": [],
+      "partsCommon": ["fixture", "supply lines", "drain assembly"],
+      "description": "Install new plumbing fixture (faucet, sink, toilet)."
+    },
+    {
+      "id": "leak_repair",
+      "name": "Leak Repair",
+      "category": "repair",
+      "basePriceMin": 150,
+      "basePriceMax": 500,
+      "estimatedHours": 1.0,
+      "requiredSkills": ["residential"],
+      "requiredCerts": [],
+      "partsCommon": ["pipe fittings", "solder", "flux", "pipe"],
+      "description": "Locate and repair water leak."
+    },
+    {
+      "id": "emergency_leak",
+      "name": "Emergency Leak / Burst Pipe",
+      "category": "emergency",
+      "basePriceMin": 300,
+      "basePriceMax": 1200,
+      "estimatedHours": 2.0,
+      "requiredSkills": ["emergency", "residential"],
+      "requiredCerts": [],
+      "partsCommon": ["pipe fittings", "shutoff valves", "pipe"],
+      "description": "Emergency response for active leaks or burst pipes."
+    },
+    {
+      "id": "toilet_repair",
+      "name": "Toilet Repair",
+      "category": "repair",
+      "basePriceMin": 100,
+      "basePriceMax": 300,
+      "estimatedHours": 1.0,
+      "requiredSkills": ["fixture"],
+      "requiredCerts": [],
+      "partsCommon": ["flapper", "fill valve", "wax ring", "bolts"],
+      "description": "Repair running, leaking, or clogged toilet."
+    }
+  ]
+}
