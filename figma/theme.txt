@@ -1,0 +1,88 @@
+Podium AI Hackathon Theme
+THE CHALLENGE
+Build an AI agent that can autonomously operate a real business.
+Not assist. Not advice. Operate.
+Your agent is the one making decisions — which customers to pursue, what to charge, how to
+handle a cancellation, when to hire, whether to run a promotion. A human might check in, but the
+business runs whether they do or not.
+WHAT WE MEAN BY "RUN A BUSINESS"
+Think about what it actually takes to operate a simple business. Take a lawn care company:
+Someone has to find customers — maybe that means door-knocking, maybe it means
+responding to leads on a website, maybe it means asking existing customers for referrals.
+Someone has to qualify those customers — what's the lot size, how often do they want service,
+are they in the service area? Someone has to set prices that are competitive but profitable.
+Someone has to schedule the work across crews and geography so you're not driving 40
+minutes between jobs. Someone has to buy equipment and supplies — and decide when the old
+mower isn't worth repairing anymore. Someone has to hire and manage workers — figure out
+when you need another crew, who's reliable, who handles the difficult customers well. Someone
+has to deal with problems — the customer who says you scalped their lawn, the rainy day that
+blows up your schedule, the crew member who no-shows. And someone has to think about the
+business — are we profitable? Should we add a new service? Are we losing customers, and why?
+That's a lot. And it's different for every business. A food truck has inventory and menu decisions
+but no recurring customers. A tutoring center has complex matching (student to tutor to subject
+to schedule) but no physical logistics. A dog walking service is all about trust and reliability and
+route optimization.
+Your job is to pick a business, understand what it really takes to run it, and then build an agent
+that handles a meaningful part of that — autonomously.
+HOW YOU'LL BE JUDGED
+WHAT YOU BUILD
+The working agent you demo. Judges will interact with it live. They'll throw curveballs at it.
+They'll want to see it make real decisions — not follow scripts, not parrot responses, not require
+a human to hold its hand.
+You do not need to build everything. In fact, trying to build everything is a trap. Pick the part of
+the business where an autonomous agent is most interesting, most valuable, or most
+differentiated — and go deep. That might be customer interactions. It might be operational
+optimization. It might be something you discover along the way that nobody else thought of.
+A tight, polished agent that handles one workflow with genuine autonomy will always beat a
+sprawling agent that does twelve things shallowly.
+CRITERIA (ORDERED BY WEIGHT)
+- Autonomy — Does the agent operate independently? Does it make decisions, handle full
+workflows end-to-end, and initiate actions without being prompted? Could you walk away
+and the business keeps running?
+- Business Value — Does this solve a real problem a real business owner has? Is the agent
+doing something meaningfully useful — not just technically impressive, but actually
+valuable?
+- Technical Execution — How ambitious and well-built is the engineering? Did the team
+tackle hard problems — multi-step reasoning, state management, tool use, real-time
+adaptation?
+- Demo & Storytelling — Did the demo land? Was the agent's capability clearly
+communicated? Did the team demonstrate a deep understanding of the business they
+chose?
+PICKING YOUR BUSINESS
+Choose a simple, familiar business. Some starting points:
+- Dog walking service
+- House cleaning service
+- Lawn care company
+- Auto detailing shop
+- ...or pitch your own
+Don't just pick what sounds fun — pick what you understand. The teams that do well will be the
+ones who know the real pain points of the business they choose. If you've ever waited tables,
+build a restaurant agent. If you've hired contractors, build a home services agent. Domain
+knowledge is a cheat code.
+As you choose, think about what makes your business interesting as an AI problem. Every
+business has a mix of:
+- Customer-facing work — acquiring, communicating with, and retaining customers
+- Operational decisions — scheduling, routing, resource allocation, staffing
+- Strategic thinking — pricing, promotions, service mix, market positioning
+- Problem-solving — handling complaints, adapting to disruptions, managing risk
+You don't need to cover all of these. But knowing which ones matter most for your business will
+help you decide where to focus your build.
+TIPS
+1. Start with the problem, not the tech. Know who the customer is and what pain you're
+removing. If we can't immediately feel the problem, the solution won't land.
+2. Go deep, not wide. Pick one or two workflows and make them genuinely autonomous.
+Clear thinking shows up in the product.
+3. Stress-test before the judges do. What happens when three customers book the same
+slot? When a supplier falls through? When someone leaves a brutal review? Find the
+breaking points early.
+4. Think about what autonomy actually requires. Your agent needs memory, judgment, and
+initiative. These are hard problems — solving even one of them well is impressive.
+5. Take risks. Build something that hasn't been built before. The category awards exist to
+recognize teams that swing big, even if the execution isn't flawless.
+Anthropic + Cursor Credits
+- Credits - $250 Claude Code per team; $100 Cursor per individual
+- Details for access have been sent via email
+- If you run out of Cursor credits, text us at 712-220-7631
+- Any spend beyond these limits is covered by participants
+SUBMIT YOUR PROJECT
+Submit details about your project by 4pm using this google form.
