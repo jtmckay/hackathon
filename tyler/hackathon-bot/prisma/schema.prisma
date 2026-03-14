@@ -70,7 +70,7 @@ model ScheduledJob {
   type         String   // from job catalog
   customerName String
   address      String
-  status       String   @default("scheduled") // scheduled, in_progress, completed, paused, rescheduled, cancelled
+  status       String   @default("scheduled") // scheduled, in_progress, completed, paused, rescheduled, cancelled, needs_rescheduling
   bumpable     Boolean  @default(false)
   notes        String?
   priority     Int      @default(5) // 1=highest, 10=lowest

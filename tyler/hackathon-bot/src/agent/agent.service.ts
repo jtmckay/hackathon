@@ -97,7 +97,8 @@ const EMERGENCY_TOOL: Anthropic.Tool = {
   name: 'post_emergency_alert',
   description:
     'Post an EMERGENCY INCOMING alert to the ops channel when severity is Critical or Urgent. ' +
-    'Call as soon as severity is determined — before all qualifying questions are answered. Call only once per incident.',
+    'Call as soon as severity is determined. Check your conversation history — do NOT call this again if you already called it for this emergency. ' +
+    'A second emergency from a different customer IS a new incident and should get its own alert.',
   input_schema: {
     type: 'object' as const,
     properties: {
@@ -118,7 +119,9 @@ const DISPATCH_TOOL: Anthropic.Tool = {
   name: 'dispatch_tech',
   description:
     'Dispatch a tech to the emergency once address is confirmed. Include every tech in consideredTechs. ' +
-    'Call only once per incident.',
+    'Check your conversation history — do NOT call this again for an emergency already dispatched. ' +
+    'A second distinct emergency (different customer or address) is a new incident and should be dispatched separately. ' +
+    'Call this together with handle_cascade in the same response.',
   input_schema: {
     type: 'object' as const,
     properties: {
@@ -224,12 +227,12 @@ const COMPLETE_JOB_TOOL: Anthropic.Tool = {
     properties: {
       techId: { type: 'string' },
       techName: { type: 'string' },
-      jobId: { type: 'string', description: 'The completed job ID — infer from their current in_progress job in the schedule' },
+      jobId: { type: 'string', description: 'The completed job ID — read it from the bracket in the schedule: [job-001]' },
       jobType: { type: 'string' },
       customerName: { type: 'string' },
       customerFollowUpMessage: { type: 'string', description: 'Follow-up to send to customer — ask how it went, invite feedback' },
     },
-    required: ['techId', 'techName', 'jobType', 'customerName', 'customerFollowUpMessage'],
+    required: ['techId', 'techName', 'jobId', 'jobType', 'customerName', 'customerFollowUpMessage'],
   },
 };
 
@@ -272,7 +275,7 @@ export class AgentService {
     this.client = new Anthropic();
   }
 
-  async chat(channelId: string, channel: 'customer' | 'ops', userMessage: string): Promise<ChatResult> {
+  async chat(channelId: string, channel: 'customer' | 'ops' | 'tech', userMessage: string): Promise<ChatResult> {
     const systemPrompt = await this.systemPromptBuilder.build(channel);
 
     if (!this.conversationHistory.has(channelId)) {
@@ -283,12 +286,10 @@ export class AgentService {
 
     const recentHistory = history.slice(-20);
 
-    // Filter out one-shot tools that already fired this incident
-    const tools = ALL_TOOLS.filter(t => {
-      if (t.name === 'post_emergency_alert' && this.alertFired.has(channelId)) return false;
-      if (t.name === 'dispatch_tech' && this.dispatchFired.has(channelId)) return false;
-      return true;
-    });
+    // Tech channel only gets operational tools — no emergency intake
+    const tools = channel === 'tech'
+      ? [CASCADE_TOOL, COMPLETE_JOB_TOOL, CALLBACK_TOOL]
+      : ALL_TOOLS;
 
     try {
       const firstResponse = await this.client.messages.create({
@@ -318,7 +319,7 @@ export class AgentService {
                 emergencyAlert = block.input as EmergencyAlertData;
                 this.alertFired.add(channelId);
               }
-              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Emergency alert posted.' });
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Alert posted to ops. Now reply to the customer — continue qualifying, ask the next question.' });
               break;
 
             case 'dispatch_tech':
@@ -326,39 +327,39 @@ export class AgentService {
                 dispatchDecision = block.input as DispatchDecisionData;
                 this.dispatchFired.add(channelId);
               }
-              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Dispatch logged. Schedule updating.' });
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Dispatch logged. Now reply to the customer — tell them who is coming, their first name, and the approximate ETA in minutes.' });
               break;
 
             case 'escalate_to_blake':
               escalateToBlake = block.input as EscalationData;
-              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Escalation sent to Blake.' });
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Escalation sent. Now reply to the customer — tell them Blake is being contacted and they will have someone as fast as possible.' });
               break;
 
             case 'handle_cascade':
               cascade = block.input as CascadeData;
-              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Cascade decisions logged. Executing now.' });
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Cascade logged. Now reply in this channel — brief confirmation appropriate to who you are talking to.' });
               break;
 
             case 'complete_job':
               completeJob = block.input as CompleteJobData;
-              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Job marked complete.' });
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Job marked complete. Now reply to the tech — confirm, tell them what is next on their schedule.' });
               break;
 
             case 'flag_callback_alert':
               callbackAlert = block.input as CallbackAlertData;
-              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Callback flagged in ops.' });
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Callback flagged. Now reply to the customer — apologize, tell them we will make it right at no charge.' });
               break;
 
             default:
-              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Acknowledged.' });
+              toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Done. Now reply to the person you are talking to.' });
           }
         }
 
-        // Second call — get the customer/ops facing response
+        // Second call — get the conversational reply. Instruct Claude to always produce text.
         const secondResponse = await this.client.messages.create({
           model: 'claude-sonnet-4-6',
           max_tokens: 1024,
-          system: systemPrompt,
+          system: systemPrompt + '\n\nIMPORTANT: You MUST write a plain text reply right now. Do not call any tools. Write at least one sentence.',
           messages: [
             ...recentHistory.map(m => ({ role: m.role, content: m.content })),
             { role: 'assistant' as const, content: firstResponse.content },
@@ -370,6 +371,22 @@ export class AgentService {
           .filter(b => b.type === 'text')
           .map(b => (b as Anthropic.TextBlock).text)
           .join('');
+
+        // Safety net — if Claude still returned nothing, build a minimal response from context
+        if (!finalResponse.trim()) {
+          if (dispatchDecision) {
+            finalResponse = `${dispatchDecision.selectedTechName.split(' ')[0]} is on the way. ETA approximately ${dispatchDecision.estimatedDriveMinutes} minutes.`;
+          } else if (emergencyAlert) {
+            finalResponse = 'Got it — our team is on this. Stay on the line with me.';
+          } else if (escalateToBlake) {
+            finalResponse = "I'm contacting our owner Blake directly to get someone to you as fast as possible.";
+          } else if (completeJob) {
+            finalResponse = `Got it. ${completeJob.customerName} has been followed up with.`;
+          } else {
+            finalResponse = 'On it.';
+          }
+          this.logger.warn(`Empty response from Claude after tool use — used fallback for channelId ${channelId}`);
+        }
       } else {
         finalResponse = firstResponse.content
           .filter(b => b.type === 'text')

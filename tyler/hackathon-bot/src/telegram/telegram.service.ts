@@ -3,6 +3,8 @@ import { InjectBot } from 'nestjs-telegraf';
 import { Telegraf, Context } from 'telegraf';
 import { PrismaService } from '../prisma.service';
 
+export type ChannelType = 'operator' | 'customer' | 'tech' | 'unknown';
+
 @Injectable()
 export class TelegramService {
   private readonly logger = new Logger(TelegramService.name);
@@ -12,59 +14,78 @@ export class TelegramService {
     private prisma: PrismaService,
   ) {}
 
+  // ─── Channel ID accessors ──────────────────────────────────────────────────
+
   get multiChannelEnabled(): boolean {
     return process.env.MULTI_CHANNEL_ENABLED === 'true';
+  }
+
+  get operatorGroupId(): string {
+    return process.env.OPERATOR_GROUP_ID || '';
+  }
+
+  get customerGroupId(): string {
+    return process.env.CUSTOMER_GROUP_ID || '';
+  }
+
+  get techGroupId(): string {
+    return process.env.TECH_GROUP_ID || '';
   }
 
   get groupChatId(): string {
     return process.env.GROUP_CHAT_ID || '';
   }
 
-  get customerChannelId(): string {
-    return process.env.CUSTOMER_CHANNEL_ID || '';
-  }
+  // ─── Routing ───────────────────────────────────────────────────────────────
 
-  get opsChannelId(): string {
-    return process.env.OPS_CHANNEL_ID || '';
-  }
-
-  resolveChannel(chatId: string): 'ops' | 'customer' | 'unified' {
-    if (!this.multiChannelEnabled) return 'unified';
-    if (chatId === this.opsChannelId) return 'ops';
-    if (chatId === this.customerChannelId) return 'customer';
-    return 'unified';
+  resolveChannel(chatId: string): ChannelType {
+    if (this.multiChannelEnabled) {
+      if (chatId === this.operatorGroupId) return 'operator';
+      if (chatId === this.customerGroupId) return 'customer';
+      if (chatId === this.techGroupId) return 'tech';
+      return 'unknown';
+    }
+    // Single-channel fallback — treat the unified group as operator
+    if (chatId === this.groupChatId) return 'operator';
+    return 'unknown';
   }
 
   isKnownChat(chatId: string): boolean {
-    if (!this.multiChannelEnabled) {
-      return chatId === this.groupChatId;
-    }
-    return chatId === this.customerChannelId || chatId === this.opsChannelId;
+    return this.resolveChannel(chatId) !== 'unknown';
   }
 
-  async sendToGroup(message: string) {
-    if (!this.groupChatId) {
-      this.logger.warn('GROUP_CHAT_ID not set');
-      return;
-    }
-    await this.bot.telegram.sendMessage(this.groupChatId, message);
+  // ─── Send helpers ──────────────────────────────────────────────────────────
+
+  async sendToOperator(message: string): Promise<void> {
+    const target = this.multiChannelEnabled ? this.operatorGroupId : this.groupChatId;
+    if (!target) { this.logger.warn('No operator channel configured'); return; }
+    await this.bot.telegram.sendMessage(target, message);
   }
 
-  async sendToOps(message: string) {
-    if (this.multiChannelEnabled && this.opsChannelId) {
-      await this.bot.telegram.sendMessage(this.opsChannelId, message);
-    } else {
-      await this.sendToGroup(message);
-    }
+  async sendToCustomer(message: string): Promise<void> {
+    const target = this.multiChannelEnabled ? this.customerGroupId : this.groupChatId;
+    if (!target) { this.logger.warn('No customer channel configured'); return; }
+    await this.bot.telegram.sendMessage(target, message);
   }
 
-  async sendToCustomer(message: string) {
-    if (this.multiChannelEnabled && this.customerChannelId) {
-      await this.bot.telegram.sendMessage(this.customerChannelId, message);
-    } else {
-      await this.sendToGroup(message);
-    }
+  async sendToTech(message: string): Promise<void> {
+    const target = this.multiChannelEnabled ? this.techGroupId : this.groupChatId;
+    if (!target) { this.logger.warn('No tech channel configured'); return; }
+    await this.bot.telegram.sendMessage(target, message);
   }
+
+  /** Legacy alias — ops = operator */
+  async sendToOps(message: string): Promise<void> {
+    return this.sendToOperator(message);
+  }
+
+  /** Send a message to a specific chat by ID */
+  async sendToChat(chatId: string, message: string): Promise<void> {
+    if (!chatId) return;
+    await this.bot.telegram.sendMessage(chatId, message);
+  }
+
+  // ─── Structured ops posts ──────────────────────────────────────────────────
 
   async postEmergencyAlert(data: {
     severity: 'Critical' | 'Urgent';
@@ -90,8 +111,8 @@ export class TelegramService {
       `Status: Qualifying — awaiting dispatch decision`,
     ];
 
-    await this.sendToOps(lines.join('\n'));
-    this.logger.log(`Emergency alert posted: ${data.severity} — ${data.issue}`);
+    await this.sendToOperator(lines.join('\n'));
+    this.logger.log(`Emergency alert: ${data.severity} — ${data.issue}`);
   }
 
   async postDispatchDecision(
@@ -127,8 +148,8 @@ export class TelegramService {
       displacedLines,
     ];
 
-    await this.sendToOps(lines.join('\n'));
-    this.logger.log(`Dispatch decision posted: ${decision.selectedTechName}`);
+    await this.sendToOperator(lines.join('\n'));
+    this.logger.log(`Dispatch decision: ${decision.selectedTechName}`);
   }
 
   async postDispatchOrder(decision: {
@@ -152,7 +173,9 @@ export class TelegramService {
       'Call the customer when 5 minutes away.',
     ];
 
-    await this.sendToOps(lines.join('\n'));
+    // Dispatch order goes to both operator and tech channels
+    await this.sendToOperator(lines.join('\n'));
+    await this.sendToTech(lines.join('\n'));
   }
 
   async postEscalation(data: {
@@ -172,8 +195,8 @@ export class TelegramService {
       techLines,
     ];
 
-    await this.sendToOps(lines.join('\n'));
-    this.logger.log('Escalation posted to ops channel');
+    await this.sendToOperator(lines.join('\n'));
+    this.logger.log('Escalation posted');
   }
 
   async postScheduleRebuild(
@@ -186,12 +209,11 @@ export class TelegramService {
       trigger === 'job_overrun' ? `${affectedTechName} job running long` :
       `${affectedTechName} pulled for emergency`;
 
-    const decisionLines = decisions.map(d => {
-      if (d.action === 'reassign') {
-        return `  Reassigned: ${d.jobType} @ ${d.customerName} → ${d.reassignToTechName} at ${d.newTime}`;
-      }
-      return `  Rescheduled: ${d.jobType} @ ${d.customerName} → ${d.newDay ?? 'next available'}`;
-    });
+    const decisionLines = decisions.map(d =>
+      d.action === 'reassign'
+        ? `  Reassigned: ${d.jobType} @ ${d.customerName} → ${d.reassignToTechName} at ${d.newTime}`
+        : `  Rescheduled: ${d.jobType} @ ${d.customerName} → ${d.newDay ?? 'next available'}`
+    );
 
     const lines = [
       '📅 SCHEDULE UPDATE',
@@ -203,7 +225,7 @@ export class TelegramService {
       'All affected customers notified.',
     ];
 
-    await this.sendToOps(lines.join('\n'));
+    await this.sendToOperator(lines.join('\n'));
   }
 
   async postBlakeBriefing(data: {
@@ -227,7 +249,7 @@ export class TelegramService {
       'Schedule is stable. No action needed unless noted above.',
     ];
 
-    await this.sendToOps(lines.join('\n'));
+    await this.sendToOperator(lines.join('\n'));
   }
 
   async postCallbackAlert(data: {
@@ -240,10 +262,10 @@ export class TelegramService {
       `Customer: ${data.customerName}`,
       `Recent work: ${data.recentJobDescription}`,
       `Now reporting: ${data.currentIssue}`,
-      'Action: Offer to fix at no charge per warranty policy. Assign original tech if possible.',
+      'Action: Offer to fix at no charge per warranty policy.',
     ];
 
-    await this.sendToOps(lines.join('\n'));
+    await this.sendToOperator(lines.join('\n'));
     this.logger.log(`Callback alert: ${data.customerName}`);
   }
 
@@ -269,8 +291,10 @@ export class TelegramService {
         const icon =
           job.status === 'scheduled' ? '⏳' :
           job.status === 'in_progress' ? '🔧' :
-          job.status === 'completed' ? '✅' : '⚠️';
-        lines.push(`  ${icon} ${job.time} — ${job.type} @ ${job.customerName}${job.bumpable ? ' [bumpable]' : ''}`);
+          job.status === 'completed' ? '✅' :
+          job.status === 'paused' ? '⏸' :
+          job.status === 'needs_rescheduling' ? '🔄' : '⚠️';
+        lines.push(`  ${icon} ${job.time} — ${job.type} @ ${job.customerName}${job.bumpable ? ' [bumpable]' : ''} [${job.status}]`);
       }
       lines.push('');
     }

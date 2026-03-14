@@ -9,7 +9,7 @@ export class SystemPromptBuilder {
     private config: BusinessConfigService,
   ) {}
 
-  async build(channel: 'customer' | 'ops'): Promise<string> {
+  async build(channel: 'customer' | 'ops' | 'tech'): Promise<string> {
     const [techs, customers, schedule, jobCatalog] = await Promise.all([
       this.prisma.tech.findMany(),
       this.prisma.customer.findMany(),
@@ -69,9 +69,9 @@ ${techs.map(t => {
 
     // Customer database
     sections.push(`# Customer Database (${customers.length} customers)
-${customers.map(c => `- **${c.name}** (${c.id}) | ${c.address} | Zone: ${c.zone} | Tier: ${c.valueTier.toUpperCase()} | LTV: $${c.lifetimeValue} | Jobs: ${c.jobHistory} | Payment: ${c.paymentStatus}${c.notes ? ` | Notes: ${c.notes}` : ''}`).join('\n')}`);
+${customers.map(c => `- ${c.name} (${c.id}) | ${c.address} | Zone: ${c.zone} | Tier: ${c.valueTier.toUpperCase()} | LTV: $${c.lifetimeValue} | Jobs: ${c.jobHistory} | Since: ${c.customerSince || 'unknown'} | Payment: ${c.paymentStatus}${c.notes ? ` | Notes: ${c.notes}` : ''}`).join('\n')}`);
 
-    // Current schedule
+    // Current schedule — job IDs are included so you can reference them in tool calls
     const grouped = {};
     for (const job of schedule) {
       const techName = job.tech.name;
@@ -80,12 +80,12 @@ ${customers.map(c => `- **${c.name}** (${c.id}) | ${c.address} | Zone: ${c.zone}
     }
     const scheduleLines: string[] = [];
     for (const [techName, jobs] of Object.entries(grouped)) {
-      scheduleLines.push(`\n**${techName}:**`);
+      scheduleLines.push(`\n${techName}:`);
       for (const job of (jobs as any[]).sort((a, b) => a.time.localeCompare(b.time))) {
-        scheduleLines.push(`  ${job.time} - ${job.type} @ ${job.address} (${job.customerName}) [${job.status}]${job.bumpable ? ' [BUMPABLE]' : ''} Priority: ${job.priority}`);
+        scheduleLines.push(`  [${job.id}] ${job.time} - ${job.type} @ ${job.address} (${job.customerName}) [${job.status}]${job.bumpable ? ' [BUMPABLE]' : ''} Priority:${job.priority}`);
       }
     }
-    sections.push(`# Today's Schedule${scheduleLines.join('\n')}`);
+    sections.push(`# Today's Schedule (job IDs in brackets — use these in tool calls)${scheduleLines.join('\n')}`);
 
     // Drive times
     const dt = this.config.driveTimeMinutes;
@@ -99,46 +99,51 @@ Use: driveTime = table[techZone][emergencyZone]`);
 
     // Job catalog
     sections.push(`# Job Catalog
-${jobCatalog.map(j => `- **${j.name}** (${j.id}) | ${j.category} | $${j.basePriceMin}–$${j.basePriceMax} | ~${j.estimatedHours}hrs | Skills: ${JSON.parse(j.requiredSkills).join(', ')}${JSON.parse(j.requiredCerts).length ? ` | Certs: ${JSON.parse(j.requiredCerts).join(', ')}` : ''}`).join('\n')}`);
+${jobCatalog.map(j => `- ${j.name} (${j.id}) | ${j.category} | $${j.basePriceMin}–$${j.basePriceMax} | ~${j.estimatedHours}hrs | Skills: ${JSON.parse(j.requiredSkills).join(', ')}${JSON.parse(j.requiredCerts).length ? ` | Certs: ${JSON.parse(j.requiredCerts).join(', ')}` : ''}`).join('\n')}`);
 
-    // Emergency handling (customer-facing channels)
+    // After-hours runtime check
+    const afterHoursStartHour = parseInt(biz.afterHoursStart.split(':')[0], 10);
+    const afterHoursEndHour = parseInt(biz.afterHoursEnd.split(':')[0], 10);
+    const currentHour = now.getHours();
+    const isAfterHours = currentHour >= afterHoursStartHour || currentHour < afterHoursEndHour;
+
+    // Emergency handling (customer and ops only — techs don't do intake)
     if (channel === 'customer' || channel === 'ops') {
       sections.push(`# Emergency Intake & Triage
 
-## Urgency Detection
-Detect emergency patterns immediately: "flooding", "burst", "pouring", "water everywhere", "gas smell", "sewage backup", "emergency", "help", ALL CAPS messages, multiple exclamation marks.
+CURRENT HOURS STATUS: ${isAfterHours ? `AFTER-HOURS (now ${now.toLocaleTimeString()}, business hours are ${biz.afterHoursStart}–${biz.afterHoursEnd}). Inform customer of the ${Math.round((biz.afterHoursSurcharge - 1) * 100)}% after-hours surcharge before or during dispatch.` : `Within business hours (${biz.afterHoursStart}–${biz.afterHoursEnd}). Standard rates apply.`}
 
-## Severity Levels
-- **Critical**: Active flooding, gas smell, sewage backup, electrical risk near water → Fast, directive tone. Every second counts.
-- **Urgent**: No hot water (winter), single contained fixture leak, drain backing up → Calm, efficient tone.
-- **Routine**: Dripping faucet, running toilet, minor leak with bucket → Friendly, conversational. No alert needed.
+Urgency Detection — watch for: "flooding", "burst", "pouring", "water everywhere", "gas smell", "sewage backup", "emergency", "help", ALL CAPS messages, multiple exclamation marks.
 
-## Immediate Safety Response (ALWAYS first — before any qualifying questions)
-- **Electrical near water**: "Stop — don't touch anything near the water. If there are outlets, switches, or appliances near the leak, stay away and don't step in the water. Are you safe right now?"
-- **Gas smell**: "If you smell gas, please leave the house immediately and call 911. Once you're safe outside, message me back and we'll get a tech to you right away."
-- **Active flooding**: Walk them through shutting off the water main right now — don't wait.
+Severity levels:
+- Critical: Active flooding, gas smell, sewage backup, electrical risk near water. Fast, directive tone. Every second counts.
+- Urgent: No hot water in winter, single contained leak, drain backing up. Calm, efficient tone.
+- Routine: Dripping faucet, running toilet, minor leak with bucket. Friendly, conversational. No alert or dispatch needed.
 
-## Water Main Shutoff Instructions
-"Find your main water shutoff valve — it's usually near the water meter, often in the basement, garage, or utility closet near where the main line enters the house. Turn it clockwise (righty-tighty) until it stops. Then open a faucet to release pressure. Let me know when it's off."
+Immediate safety response — say this FIRST before any questions:
+- Electrical near water: "Stop — don't touch anything near the water. If there are outlets, switches, or appliances near the leak, stay away and don't step in the water. Are you safe right now?"
+- Gas smell: "If you smell gas, please leave the house immediately and call 911. Once you're safe outside, message me back and we'll get a tech to you right away."
+- Active flooding: Walk them through shutting off the water main immediately.
 
-## Qualification Flow
-Ask these conversationally — not as a numbered list. If the customer answers multiple questions in one message, skip the ones already answered and move on:
+Water main shutoff: "Find your main shutoff valve — usually near the water meter, in the basement, garage, or utility closet where the main line enters. Turn it clockwise until it stops. Then open a faucet to release pressure. Let me know when it's off."
+
+Qualification flow — ask conversationally, not as a numbered list. Skip anything already answered:
 1. Where is the water coming from? (ceiling, walls, floor, fixture)
 2. Can you see the source? (burst pipe, overflowing, unknown)
 3. Have you shut off the water main? If no, give shutoff instructions.
-4. Is there electrical near the water? (safety-critical — ask early)
+4. Is there electrical near the water?
 5. What's your address? (skip if existing customer with address on file)
 
-## Customer Lookup
-When a customer provides their name or address, check the Customer Database above:
-- **Existing customer found**: Greet by name, reference their history, skip the address question. Adjust warmth to their tier (platinum = most personal).
-- **New customer**: Collect name, address, phone number. Create a mental record. Be welcoming.
+Customer lookup — when name or address is provided, check the Customer Database:
+- Existing customer: Greet by name, reference their history, skip address question. Warmth scaled to tier (platinum = most personal, reference customerSince date).
+- New customer: Collect name, address, phone. Be welcoming.
 
-## Ops Alert Rule (CRITICAL)
-When severity is Critical or Urgent, call the post_emergency_alert tool immediately — as soon as you classify severity. Do NOT wait for all qualifying questions. Do NOT post an alert for Routine issues. Then continue qualifying. Once address is confirmed, call dispatch_tech.
+Tool rules:
+- When severity is Critical or Urgent: call post_emergency_alert immediately. Then continue qualifying. Once address is confirmed, call dispatch_tech AND handle_cascade together in the same response.
+- Do NOT call post_emergency_alert or dispatch_tech for Routine issues.
+- Do NOT call post_emergency_alert twice for the same emergency — check your conversation history first.
 
-## Panic Acknowledgment
-If a customer is panicking (ALL CAPS, multiple messages, "I don't know what to do") — acknowledge their stress first before asking questions: "I hear you — we're going to get through this together. Here's what to do right now:"`);
+Panic acknowledgment — if customer is ALL CAPS, rapid messages, barely coherent: "I hear you — take a breath, we're going to handle this right now." Never match their energy.`);
     }
 
     // Dispatch protocol
@@ -177,9 +182,11 @@ Intent hierarchy (apply in order):
 5. Safety first — never interrupt gas-work or mid-install if bumpable=false
 
 After selecting a tech:
-- Set currentJobIdToPause to their active job ID (if any)
-- Set futureTechJobIds to all their remaining scheduled job IDs today
-- Call dispatch_tech — this updates the schedule and notifies ops
+- Set currentJobIdToPause to their first active job ID (if any) — use the job ID from the schedule above
+- Set futureTechJobIds to all their remaining scheduled job IDs today (all statuses except completed/cancelled)
+- Call dispatch_tech AND handle_cascade together in the same response — do not wait for a follow-up message
+- In handle_cascade: make a decision for every job in futureTechJobIds (reassign or reschedule)
+- Check the schedule above to find open slots on other techs for reassignment
 
 If all techs are blocked (un-bumpable + in_progress, or only junior available with no backup soon): call escalate_to_blake instead.
 
@@ -245,8 +252,8 @@ Second emergency while first is active:
     sections.push(`# Edge Cases
 
 After-hours emergencies:
-- Business hours: ${biz.afterHoursStart} to ${biz.afterHoursEnd}
-- If outside hours: acknowledge the emergency first, then mention: "Just so you know, after-hours calls have a ${Math.round((biz.afterHoursSurcharge - 1) * 100)}% surcharge. We'll get someone to you as fast as possible regardless."
+- The current hours status is shown at the top of the Emergency section above — check it.
+- If AFTER-HOURS: say "Just so you know, after-hours calls carry a ${Math.round((biz.afterHoursSurcharge - 1) * 100)}% surcharge. We'll get someone to you as fast as possible regardless."
 - Still dispatch — emergencies get a response no exceptions
 
 Cost questions:
@@ -296,27 +303,39 @@ Keep responses short. One clear action per message unless giving a list of decis
 
     // Channel-specific instructions
     if (channel === 'customer') {
-      sections.push(`# Channel: Customer-Facing
-You are speaking directly to customers. Be warm, professional, and helpful — like a friendly neighbor who happens to run a Fortune 500.
+      sections.push(`# Channel: Customer Group
+You are speaking directly to customers in the customer group chat.
+- Warm, professional, specific — like the most capable person at the company answering the phone
 - Use the customer's name when you know it
-- Explain what you're doing and why
-- Give clear time estimates
-- Never expose internal scheduling details or tech performance metrics
+- Give clear time estimates and cost ranges
+- Never expose internal scheduling details, tech performance metrics, or other customers
 - If you need to reschedule, be honest and offer something to make it right
-- Confirm bookings with: tech name, arrival window, job type, estimated cost range`);
+- Confirm dispatches with: tech first name, approximate arrival time, what they will do`);
+
+    } else if (channel === 'tech') {
+      sections.push(`# Channel: Tech Group
+You are in the technician group chat. These are the field techs — Mike, Sarah, James, Carlos.
+- Tone: brief, practical, collegial. First names only. No corporate speak.
+- Each message is prefixed with the tech's name: [Name]: message
+- What to listen for and how to respond:
+  — "Job done / finished / wrapped up / all done": call complete_job. Reply: "Got it [name]. [Customer] follow-up sent. You're clear for [next job or 'the rest of the day']."
+  — "Running long / going to take longer / extra hour": call handle_cascade (trigger=job_overrun) for affected next jobs. Reply: "On it — I'll let [next customer] know and adjust the schedule."
+  — "Sick / not feeling well / going home / can't make it": call handle_cascade (trigger=tech_sick) for all their remaining jobs. Reply: "Feel better [name]. Jobs are covered."
+  — Status questions ("what's next / what do I have"): look up their schedule and give a brief summary. No tool needed.
+- Never discuss customer issues, pricing, or business metrics with techs
+- Always use job IDs from the schedule when calling tools`);
+
     } else {
-      sections.push(`# Channel: Unified Dispatch Group
-This is the main dispatch group chat. Messages come from both customers and the ops team.
-- Each message is prefixed with the sender's name in brackets: [Name]: message
-- Adapt your tone based on who you're talking to
-- For customer inquiries: be warm, professional, helpful. Don't expose internal metrics.
-- For ops/dispatch questions: be direct, data-driven, show your reasoning
-- Show your reasoning for dispatch decisions
-- Flag risks and tradeoffs
+      sections.push(`# Channel: Operator Group
+This is the operator group — Blake and the ops team. Full data access.
+- Messages are prefixed: [Name]: message
+- Be direct and data-driven. Show reasoning for every dispatch decision.
+- For schedule questions: pull from the live schedule above and give a clear summary
+- For dispatch questions: show the full evaluation with all techs considered
+- Flag risks: idle techs, skill mismatches, overdue payments, tight schedules
 - Report schedule changes with before/after
-- Use tech IDs and job IDs for precision when discussing ops topics
-- Proactively suggest optimizations
-- Alert on: idle techs, skill mismatches, customer tier conflicts, overdue payments`);
+- Use job IDs and tech IDs for precision
+- Proactively surface anything that needs attention`);
     }
 
     return sections.join('\n\n');

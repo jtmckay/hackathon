@@ -45,6 +45,12 @@ export class ScheduleService {
       },
     });
 
+    // Keep tech roster current so the next system prompt build shows the right status
+    await this.prisma.tech.update({
+      where: { id: techId },
+      data: { currentJobId: emergencyJobId, status: 'on_job' },
+    });
+
     this.logger.log(`Emergency ${emergencyJobId} → ${techId}, paused: ${pausedJobId ?? 'none'}`);
     return { emergencyJobId, pausedJobId };
   }
@@ -103,21 +109,33 @@ export class ScheduleService {
   }
 
   /** Mark a job complete and log it */
+  /** Get jobs for a tech by first name (case-insensitive partial match on tech name) */
+  async getJobsForTech(firstName: string): Promise<any[]> {
+    const techs = await this.prisma.tech.findMany({
+      where: { name: { contains: firstName } },
+    });
+    if (!techs.length) return [];
+    const techId = techs[0].id;
+    return this.prisma.scheduledJob.findMany({
+      where: {
+        techId,
+        status: { notIn: ['completed', 'cancelled'] },
+      },
+      orderBy: { time: 'asc' },
+    });
+  }
+
   async completeJob(jobId: string, techId: string): Promise<void> {
-    if (jobId) {
-      await this.prisma.scheduledJob.updateMany({
-        where: { id: jobId },
-        data: { status: 'completed' },
-      });
-    } else {
-      // Fall back to completing the first in_progress job for this tech
-      await this.prisma.scheduledJob.updateMany({
-        where: { techId, status: 'in_progress' },
-        data: { status: 'completed' },
-      });
-    }
+    await this.prisma.scheduledJob.update({
+      where: { id: jobId },
+      data: { status: 'completed' },
+    });
+    await this.prisma.tech.update({
+      where: { id: techId },
+      data: { currentJobId: null, status: 'available' },
+    });
     await this.prisma.jobLog.create({
-      data: { jobId: jobId || 'unknown', techId, action: 'completed', details: 'Tech reported job complete' },
+      data: { jobId, techId, action: 'completed', details: 'Tech reported job complete' },
     });
     this.logger.log(`Job ${jobId} completed by ${techId}`);
   }
